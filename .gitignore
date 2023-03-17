@@ -1,10 +1,6 @@
 /.DS_Store
 /.ipynb_checkpoints
 /config.py
-/cv2.md
-/myenv
-/test.txt
-eth_historical_prices.csv
-output/output.py
 data/***
-output/2.py
+__pycache__/***
+myenv/***

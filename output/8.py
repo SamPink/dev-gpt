@@ -21,9 +21,8 @@ for satellite in satellites[:20]:  # Track only the first 20 satellites for simp
     alt, az, distance = topocentric.altaz()
 
     if alt.degrees > 0:  # Satellite in observer's sky
-        subpoint_longitude = topocentric.subpoint().longitude.degrees
-        subpoint_latitude = topocentric.subpoint().latitude.degrees
-        ax.plot(subpoint_longitude, subpoint_latitude, 'bo', markersize=2)
+        subpoint = topocentric.subpoint()
+        ax.plot(subpoint.longitude.degrees, subpoint.latitude.degrees, 'bo', markersize=2)
 
 # Set map parameters and display
 ax.set_title('Starlink Satellites above the observer')
