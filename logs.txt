@@ -1,0 +1,159 @@
+2023-03-17 15:33:55 [SYSTEM] Please provide a code snippet in the following format:
+
+```bash
+(required dependencies)
+```
+
+```python
+(Python code)
+```
+
+And also suggest a filename in the following format:
+file name: ([\w\-]+)
+2023-03-17 15:34:03 [USER] Write a program that plays Rock-Paper-Scissors against the user.
+2023-03-17 15:34:09 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:34:10 [ASSISTANT] Rock_Paper_Scissors_Game
+2023-03-17 15:34:10 [SYSTEM] GPT response received in 1.21 seconds
+2023-03-17 15:34:19 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:34:34 [ASSISTANT] ```bash
+pip install random
+```
+
+```python
+import random
+
+def rock_paper_scissors_game():
+    choices = ["Rock", "Paper", "Scissors"]
+    user_choice = input("Enter your choice (Rock/Paper/Scissors): ").capitalize()
+
+    while user_choice not in choices:
+        user_choice = input("Invalid input. Please choose Rock, Paper or Scissors: ").capitalize()
+
+    computer_choice = random.choice(choices)
+    print("Computer's choice:", computer_choice)
+
+    if user_choice == computer_choice:
+        print("It's a tie!")
+    elif (user_choice == "Rock" and computer_choice == "Scissors") or \
+         (user_choice == "Paper" and computer_choice == "Rock") or \
+         (user_choice == "Scissors" and computer_choice == "Paper"):
+        print("You win!")
+    else:
+        print("Computer wins!")
+
+if __name__ == "__main__":
+    rock_paper_scissors_game()
+```
+
+file name: rock_paper_scissors_game.py
+2023-03-17 15:34:34 [SYSTEM] GPT response received in 15.36 seconds
+2023-03-17 15:35:23 [SYSTEM] Please provide a code snippet in the following format:
+
+```bash
+(required dependencies)
+```
+
+```python
+(Python code)
+```
+
+And also suggest a filename in the following format:
+file name: ([\w\-]+)
+2023-03-17 15:35:47 [USER] Build a program that fetches real-time stock market data and displays it in a graph.
+2023-03-17 15:35:51 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:35:52 [ASSISTANT] RealTimeStockMarketDataGraph
+2023-03-17 15:35:52 [SYSTEM] GPT response received in 1.33 seconds
+2023-03-17 15:35:52 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:36:15 [ASSISTANT] To create a program that fetches real-time stock market data and displays it in a graph, you need to install a few dependencies:
+
+```bash
+pip install yfinance
+pip install pandas
+pip install matplotlib
+pip install mplfinance
+```
+
+Here's a Python code snippet that uses these libraries to fetch real-time stock market data and display it in a graph:
+
+```python
+import yfinance as yf
+import matplotlib.pyplot as plt
+import mplfinance as mpf
+import pandas as pd
+
+# Fetch stock market data
+def get_stock_data(ticker, start, end):
+    stock_data = yf.download(ticker, start=start, end=end)
+    return stock_data
+
+# Plot stock market data
+def plot_stock_data(stock_data, ticker):
+    mpf.plot(stock_data, type='candle', title=f'{ticker} Price', ylabel='Price (USD)', style='yahoo', volume=True, tight_layout=True)
+    plt.show()
+
+# Get and plot Microsoft stock data
+ticker = 'MSFT'
+start = '2020-01-01'
+end = '2022-01-01'
+stock_data = get_stock_data(ticker, start, end)
+plot_stock_data(stock_data, ticker)
+```
+
+This program fetches historical data for Microsoft (MSFT) and plots a candlestick graph. Note that real-time fetching isn't possible using yfinance, as it only provides historical data with a minimum of 1-day intervals. For real-time data, alternative APIs such as Alpaca or Intrinio would be needed.
+
+To run the program, save the code snippet in a file named `real_time_stock_market_data_graph.py` and execute it using Python:
+
+```bash
+python real_time_stock_market_data_graph.py
+```
+2023-03-17 15:36:15 [SYSTEM] GPT response received in 23.14 seconds
+2023-03-17 15:37:22 [SYSTEM] I ran the code and this is the output:
+2023-03-17 15:37:22 [SYSTEM] [*********************100%***********************]  1 of 1 completed
+2023-03-17 15:37:59 [USER] Write a program that plays Rock-Paper-Scissors against the user.
+2023-03-17 15:37:59 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:38:00 [ASSISTANT] Rock_Paper_Scissors_Game
+2023-03-17 15:38:00 [SYSTEM] GPT response received in 1.33 seconds
+2023-03-17 15:38:00 [SYSTEM] Waiting for GPT response...
+2023-03-17 15:38:25 [ASSISTANT] Here is a simple Python code snippet to create a command-line Rock-Paper-Scissors game against a random AI opponent:
+
+```python
+import random
+
+def ai_choice():
+    choices = ['rock', 'paper', 'scissors']
+    return random.choice(choices)
+
+def get_user_input():
+    while True:
+        user_input = input("Enter 'rock', 'paper' or 'scissors': ").lower()
+        if user_input in ['rock', 'paper', 'scissors']:
+            return user_input
+        else:
+            print("Invalid input. Please try again.")
+    
+def game_result(user, ai):
+    if user == ai:
+        return "It's a tie!"
+    elif (user == 'rock' and ai == 'scissors') or (user == 'scissors' and ai == 'paper') or (user == 'paper' and ai == 'rock'):
+        return 'You win!'
+    else:
+        return 'You lose!'
+
+if __name__ == "__main__":
+    print("Rock-Paper-Scissors Game")
+    
+    user_input = get_user_input()
+    ai_input = ai_choice()
+    print(f'You chose: {user_input}, AI chose: {ai_input}')
+    result = game_result(user_input, ai_input)
+    print(result)
+```
+
+Save the code snippet in a file named `rock_paper_scissors_game.py` and run it using Python:
+
+```bash
+python rock_paper_scissors_game.py
+```
+
+The user will be prompted to enter 'rock', 'paper' or 'scissors', and the program will display the AI's choice and the result of the game.
+2023-03-17 15:38:25 [SYSTEM] GPT response received in 25.26 seconds
