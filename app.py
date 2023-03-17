@@ -92,8 +92,66 @@ class GPT4:
                 break
 
 
+import tkinter as tk
+from tkinter import ttk
+
+
+def submit_query():
+    user_query = query_entry.get()
+    query_entry.delete(0, tk.END)
+    gpt4.add_message(user_query)
+    output_filename = f"output/{len(gpt4.messages)}.py"
+    gpt4.generate_and_save_response(output_filename)
+    gpt4.run_code_and_add_output_to_messages(output_filename)
+    update_message_display()
+
+
+def update_message_display():
+    message_display.delete(1.0, tk.END)
+    for message in gpt4.messages:
+        message_display.insert(
+            tk.END, f"{message['role'].capitalize()}: {message['content']}\n"
+        )
+
+
 if __name__ == "__main__":
     gpt4 = GPT4(config.OPENAI_API_KEY)
+    gpt4.add_message(
+        "Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\n just output the required format, nothing else.",
+        role="system",
+    )
+
+    # Create the UI
+    root = tk.Tk()
+    root.title("GPT-4 Assistant")
+
+    mainframe = ttk.Frame(root, padding="5")
+    mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+    query_label = ttk.Label(mainframe, text="Enter your query:")
+    query_label.grid(column=0, row=0, sticky=tk.W)
+
+    query_entry = ttk.Entry(mainframe, width=80)
+    query_entry.grid(column=0, row=1, sticky=(tk.W, tk.E))
+
+    submit_button = ttk.Button(mainframe, text="Submit", command=submit_query)
+    submit_button.grid(column=1, row=1, sticky=tk.W)
+
+    message_display = tk.Text(mainframe, wrap=tk.WORD, width=80, height=20)
+    message_display.grid(column=0, row=2, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+    update_message_display()
+
+    root.mainloop()
+
+    # Save the messages to a JSON file
+    with open("messages.json", "w") as f:
+        json.dump(gpt4.messages, f)
+
+
+""" 
+if __name__ == "__main__":
+    gpt4 = GPT4(config.OPENAI_API_KEY, model="gpt-3.5-turbo")
 
     # Update the initial system message to request code in the specified format
     gpt4.add_message(
@@ -108,7 +166,7 @@ if __name__ == "__main__":
     gpt4.run_code_and_add_output_to_messages(output_filename)
 
     gpt4.add_message(
-        "now update the script to get 30 days of historical data for eth in £"
+        "now update the script to get 7 days of historical data for eth in £"
     )
 
     output_filename = "output/second.py"
@@ -132,4 +190,10 @@ if __name__ == "__main__":
     gpt4.run_code_and_add_output_to_messages(output_filename)
 
     print(gpt4.messages)
+
+    # write the messages to a json file
+    with open("messages.json", "w") as f:
+        json.dump(gpt4.messages, f)
+
+ """
 

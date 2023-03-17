@@ -1,0 +1,62 @@
+[
+    {
+        "role": "system",
+        "content": "Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\n just output the required format, nothing else."
+    },
+    {
+        "role": "user",
+        "content": "write a python script to get the current eth price in \u00a3."
+    },
+    {
+        "role": "assistant",
+        "content": "```bash\npip install requests\n```\n\n```python\nimport requests\n\ndef get_eth_price_in_gbp():\n    url = \"https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp\"\n    response = requests.get(url)\n    data = response.json()\n    eth_price_gbp = data[\"ethereum\"][\"gbp\"]\n    return eth_price_gbp\n\ncurrent_eth_price_gbp = get_eth_price_in_gbp()\nprint(current_eth_price_gbp)\n```"
+    },
+    {
+        "role": "system",
+        "content": "I ran the code and this is the output:"
+    },
+    {
+        "role": "system",
+        "content": "1441.91"
+    },
+    {
+        "role": "user",
+        "content": "now update the script to get 7 days of historical data for eth in \u00a3"
+    },
+    {
+        "role": "assistant",
+        "content": "```bash\npip install requests\npip install pandas\n```\n\n```python\nimport requests\nimport pandas as pd\nfrom datetime import datetime, timedelta\n\ndef get_historical_eth_price_in_gbp(days=7):\n    end_date = datetime.now()\n    start_date = end_date - timedelta(days=days)\n    start_timestamp = int(start_date.timestamp())\n    end_timestamp = int(end_date.timestamp())\n\n    url = f\"https://api.coingecko.com/api/v3/coins/ethereum/market_chart/range?vs_currency=gbp&from={start_timestamp}&to={end_timestamp}\"\n    response = requests.get(url)\n    data = response.json()\n    prices = data[\"prices\"]\n\n    historical_prices = []\n\n    for price in prices:\n        timestamp, value = price\n        date_object = datetime.fromtimestamp(timestamp / 1000)\n        date_string = date_object.strftime('%Y-%m-%d %H:%M:%S')\n        historical_prices.append({\"date\": date_string, \"price_in_gbp\": value})\n\n    df = pd.DataFrame(historical_prices)\n    return df\n\nhistorical_eth_prices_gbp = get_historical_eth_price_in_gbp()\nprint(historical_eth_prices_gbp)\n```"
+    },
+    {
+        "role": "system",
+        "content": "I ran the code and this is the output:"
+    },
+    {
+        "role": "system",
+        "content": "date  price_in_gbp\n0    2023-03-10 13:02:04   1167.088361\n1    2023-03-10 14:02:49   1179.065559\n2    2023-03-10 15:02:06   1156.189920\n3    2023-03-10 16:02:14   1169.976416\n4    2023-03-10 17:00:56   1174.760844\n..                   ...           ...\n163  2023-03-17 08:01:08   1419.738727\n164  2023-03-17 09:00:58   1422.499818\n165  2023-03-17 10:02:03   1429.395727\n166  2023-03-17 11:00:56   1445.070709\n167  2023-03-17 12:00:27   1457.283097\n\n[168 rows x 2 columns]"
+    },
+    {
+        "role": "user",
+        "content": "now update the script to use sqlalchemy to write the data to a local sqllite database, get the data for the top 5 cryptos"
+    },
+    {
+        "role": "assistant",
+        "content": "First, install the required dependencies:\n\n```bash\npip install requests\npip install pandas\npip install sqlalchemy\n```\n\nThen you can use the following code:\n\n```python\nimport requests\nimport pandas as pd\nfrom datetime import datetime, timedelta\nfrom sqlalchemy import create_engine\n\ndef get_top_5_cryptos():\n    url = \"https://api.coingecko.com/api/v3/search/trending\"\n    response = requests.get(url)\n    data = response.json()\n    top_5 = [coin[\"item\"][\"id\"] for coin in data[\"coins\"][:5]]\n    return top_5\n\ndef get_historical_crypto_price_in_gbp(crypto_id, days=7):\n    end_date = datetime.now()\n    start_date = end_date - timedelta(days=days)\n    start_timestamp = int(start_date.timestamp())\n    end_timestamp = int(end_date.timestamp())\n\n    url = f\"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart/range?vs_currency=gbp&from={start_timestamp}&to={end_timestamp}\"\n    response = requests.get(url)\n    data = response.json()\n    prices = data[\"prices\"]\n\n    historical_prices = []\n\n    for price in prices:\n        timestamp, value = price\n        date_object = datetime.fromtimestamp(timestamp / 1000)\n        date_string = date_object.strftime('%Y-%m-%d %H:%M:%S')\n        historical_prices.append({\"crypto_id\": crypto_id, \"date\": date_string, \"price_in_gbp\": value})\n\n    df = pd.DataFrame(historical_prices)\n    return df\n\ndef store_crypto_data_to_db(crypto_data_df):\n    engine = create_engine('sqlite:///crypto_prices.db')\n    crypto_data_df.to_sql('crypto_prices', engine, if_exists='append', index=False)\n\ntop_5_cryptos = get_top_5_cryptos()\n\nfor crypto_id in top_5_cryptos:\n    historical_crypto_prices_gbp = get_historical_crypto_price_in_gbp(crypto_id)\n    print(f\"Storing historical data for {crypto_id}\")\n    store_crypto_data_to_db(historical_crypto_prices_gbp)\n\nprint(\"Historical data for the top 5 cryptocurrencies stored successfully in the SQLite database.\")\n```\n\nThis script will fetch and store the historical price data of the top 5 cryptocurrencies in GBP in a local SQLite database named `crypto_prices.db` with a table named `crypto_prices`."
+    },
+    {
+        "role": "system",
+        "content": "I ran the code and this is the output:"
+    },
+    {
+        "role": "system",
+        "content": "Storing historical data for insure\nStoring historical data for asd\nStoring historical data for optimism\nStoring historical data for sora\nStoring historical data for radiant-capital\nHistorical data for the top 5 cryptocurrencies stored successfully in the SQLite database."
+    },
+    {
+        "role": "user",
+        "content": "now update the script to use the data in the database to print some cool graphs"
+    },
+    {
+        "role": "assistant",
+        "content": "First, install the required dependencies:\n\n```bash\npip install requests\npip install pandas\npip install sqlalchemy\npip install matplotlib\n```\n\nThen you can use the following code:\n\n```python\nimport requests\nimport pandas as pd\nfrom datetime import datetime, timedelta\nfrom sqlalchemy import create_engine\nimport matplotlib.pyplot as plt\n\ndef get_top_5_cryptos():\n    url = \"https://api.coingecko.com/api/v3/search/trending\"\n    response = requests.get(url)\n    data = response.json()\n    top_5 = [coin[\"item\"][\"id\"] for coin in data[\"coins\"][:5]]\n    return top_5\n\ndef get_historical_crypto_price_in_gbp(crypto_id, days=7):\n    end_date = datetime.now()\n    start_date = end_date - timedelta(days=days)\n    start_timestamp = int(start_date.timestamp())\n    end_timestamp = int(end_date.timestamp())\n\n    url = f\"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart/range?vs_currency=gbp&from={start_timestamp}&to={end_timestamp}\"\n    response = requests.get(url)\n    data = response.json()\n    prices = data[\"prices\"]\n\n    historical_prices = []\n\n    for price in prices:\n        timestamp, value = price\n        date_object = datetime.fromtimestamp(timestamp / 1000)\n        date_string = date_object.strftime('%Y-%m-%d %H:%M:%S')\n        historical_prices.append({\"crypto_id\": crypto_id, \"date\": date_string, \"price_in_gbp\": value})\n\n    df = pd.DataFrame(historical_prices)\n    return df\n\ndef store_crypto_data_to_db(crypto_data_df):\n    engine = create_engine('sqlite:///crypto_prices.db')\n    crypto_data_df.to_sql('crypto_prices', engine, if_exists='append', index=False)\n\ndef plot_historical_crypto_data():\n    engine = create_engine('sqlite:///crypto_prices.db')\n    crypto_data_df = pd.read_sql('crypto_prices', engine)\n    crypto_data_df['date'] = pd.to_datetime(crypto_data_df['date'])\n\n    plt.figure(figsize=(15, 8))\n    for crypto_id in crypto_data_df['crypto_id'].unique():\n        crypto_df = crypto_data_df[crypto_data_df['crypto_id'] == crypto_id]\n        plt.plot(crypto_df['date'], crypto_df['price_in_gbp'], label=crypto_id)\n\n    plt.xlabel('Date')\n    plt.ylabel('Price in GBP')\n    plt.title('Historical price data of top 5 cryptocurrencies (in GBP)')\n    plt.legend()\n    plt.show()\n\n# Uncomment the following 4 lines if you want to update the database with new data for the top 5 cryptocurrencies\n# top_5_cryptos = get_top_5_cryptos()\n# for crypto_id in top_5_cryptos:\n#     historical_crypto_prices_gbp = get_historical_crypto_price_in_gbp(crypto_id)\n#     store_crypto_data_to_db(historical_crypto_prices_gbp)\n\nplot_historical_crypto_data()\n```\n\nThis script will fetch the historical price data of the top 5 cryptocurrencies stored in the SQLite database, and plot a line graph of their prices over time."
+    }
+]
