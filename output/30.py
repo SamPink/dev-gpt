@@ -1,47 +1,73 @@
-import time
-from skyfield.api import Topos, load, wgs84
-import plotly.graph_objs as go
+import requests
+from skyfield.api import Topos, load, EarthSatellite
+import plotly.graph_objects as go
+import pandas as pd
+
+
+def get_starlink_tle_data():
+    response = requests.get("https://www.celestrak.com/NORAD/elements/starlink.txt")
+    tle_lines = response.text.strip().split("\n")
+
+    satellites = {
+        f"STARLINK-{tle_lines[i].strip()}": [tle_lines[i + 1], tle_lines[i + 2]]
+        for i in range(0, len(tle_lines), 3)
+    }
+    return satellites
+
+
+def get_satellite_positions(satellite_tle_data):
+    ts = load.timescale()
+    t = ts.now()
+
+    sat_positions = []
+
+    for sat_name, tle_data in satellite_tle_data.items():
+        sat = EarthSatellite(tle_data[0], tle_data[1], sat_name)
+        geocentric = sat.at(t)
+        subpoint = geocentric.subpoint()
+        lat, lon = subpoint.latitude.degrees, subpoint.longitude.degrees
+        sat_positions.append(
+            {"satellite": sat_name, "lat": lat, "lon": lon}
+        )
+
+    return sat_positions
+
+
+def plot_satellite_positions(sat_positions):
+    df = pd.DataFrame(sat_positions)
+
+    fig = go.Figure(
+        go.Scattergeo(
+            lat=df["lat"],
+            lon=df["lon"],
+            mode="markers",
+            marker=dict(
+                size=6,
+                color="red",
+                opacity=0.7,
+            ),
+            text=df["satellite"],
+            hoverinfo="text"
+        )
+    )
+
+    fig.update_geos(
+        showcountries=True, 
+        showcoastlines=True,
+        showland=True, 
+        landcolor="rgb(235, 235, 235)",
+        countrycolor="rgb(200, 200, 200)"
+    )
+    fig.update_layout(title="Starlink Satellites on a Globe", geo=dict(showframe=False, scope="world"))
+
+    fig.show()
+
 
 def main():
-    # Load satellite data from Celestrak
-    stations_url = 'http://celestrak.com/NORAD/elements/starlink.txt'
-    satellites = load.tle_file(stations_url)
+    starlink_satellites_tle = get_starlink_tle_data()
+    satellite_positions = get_satellite_positions(starlink_satellites_tle)
+    plot_satellite_positions(satellite_positions)
 
-    # Load a timescale object to- calculate the satellite positions
-    ts = load.timescale()
-
-    while True:
-        # Get the positions of the satellites
-        sat_positions = []
-
-        for satellite in satellites[:20]:  # Track only the first 20 satellites for simplicity
-            eci = satellite.at(ts.now())  # Use ts.now() instead of ts.utc_now()
-            lon, lat, _ = wgs84.subpoint(eci)
-            sat_positions.append((lon.degrees, lat.degrees))
-
-        # Prepare the Globe
-        globe = go.Figure(go.Scattergeo())
-
-        # Draw the coastlines
-        globe.update_geos(showland=True, landcolor="rgb(243, 243, 243)",
-                          showocean=True, oceancolor="rgb(0, 0, 255)",
-                          showlakes=True, lakecolor="rgb(127, 205, 255)",
-                          showrivers=True, rivercolor="rgb(127, 205, 255)",
-                          showcountries=True, countrycolor="rgb(204, 204, 204)")
-
-        # Plot the satellite positions
-        for lon, lat in sat_positions:
-            globe.add_trace(go.Scattergeo(lon=[lon], lat=[lat],
-                                          mode='markers', marker=dict(color='red', size=6)))
-
-        # Set the title
-        globe.update_layout(title='Real-time Starlink Satellites on Globe')
-
-        # Show the plot
-        globe.show()
-
-        # Refresh the satellite position every 60 seconds (1 minute)
-        time.sleep(60)
 
 if __name__ == "__main__":
     main()

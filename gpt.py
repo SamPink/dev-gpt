@@ -109,4 +109,6 @@ class GPT4:
                     self.add_message("I ran the code and this is the output:", "system")
                     self.add_message(output, "system")
                 break
+        
+        
 

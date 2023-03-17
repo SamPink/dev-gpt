@@ -1,33 +1,32 @@
+import numpy as np
+import pandas as pd
 from skyfield.api import Topos, load
-import matplotlib.pyplot as plt
+from skyfield.sgp4lib import EarthSatellite
+import plotly.express as px
 
-# Load satellite data from Celestrak
-stations_url = 'http://celestrak.com/NORAD/elements/starlink.txt'
-satellites = load.tle_file(stations_url)
+# Get TLE data for all Starlink satellites
+starlink_tle_url = 'https://www.celestrak.com/NORAD/elements/starlink.txt'
+satellites_txt = load.tle_file(starlink_tle_url)
 
-# Load a timescale object to calculate the satellite positions and observer location
-ts = load.timescale()
+# Get the position of each satellite
+positions = []
+for i in range(0, len(satellites_txt) - 1, 2):
+    name = str(satellites_txt[i])
+    line1 = str(satellites_txt[i + 1])
+    line2 = str(satellites_txt[i + 2])
 
-# Set observer location (latitude, longitude) - example coordinates for New York
-observer_location = Topos('40.7128 N', '74.0060 W')
+    satellite = EarthSatellite(line1, line2, name, load.timescale())
+    geocentric = satellite.at(load.timescale().now())
 
-# Prepare data for plotting
-figure = plt.figure()
-ax = figure.add_subplot(1, 1, 1)
+    positions.append({
+        'name': name,
+        'x': geocentric.position.km[0],
+        'y': geocentric.position.km[1],
+        'z': geocentric.position.km[2],
+    })
 
-for satellite in satellites[:20]:  # Track only the first 20 satellites for simplicity
-    difference = satellite - observer_location
-    topocentric = difference.at(ts.now())
-    alt, az, distance = topocentric.altaz()
-
-    if alt.degrees > 0:  # Satellite in observer's sky
-        eci = satellite.at(ts.now())
-        subpoint_longitude = eci.subpoint().longitude.degrees
-        subpoint_latitude = eci.subpoint().latitude.degrees
-        ax.plot(subpoint_longitude, subpoint_latitude, 'bo', markersize=2)
-
-# Set map parameters and display
-ax.set_title('Starlink Satellites above the observer')
-ax.set_xlabel('Longitude [degrees]')
-ax.set_ylabel('Latitude [degrees]')
-plt.show()
+# Plot satellites on the globe using Plotly
+df = pd.DataFrame(positions)
+fig = px.scatter_3d(df, x='x', y='y', z='z', text='name')
+fig.update_traces(marker=dict(size=5, colorscale='Viridis'))
+fig.show()

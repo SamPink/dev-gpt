@@ -18,6 +18,11 @@ class GPT4UI:
         self.root = tk.Tk()
         self.root.title("GPT-4 Assistant")
         self.create_widgets()
+        self.session = {
+            "session_id": str(uuid.uuid4()),
+            "folder_name": None,
+            "start_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
     def create_widgets(self):
         mainframe = ttk.Frame(self.root, padding="5")
@@ -29,6 +34,8 @@ class GPT4UI:
         self.query_var = tk.StringVar()
         query_options = [
             "create a python doodle jump game using pygame",
+            "create a python script print 10 + 10",
+            "create an application that tracks all the starlink satellites in the sky and plots them on a globe",
             "Custom"
         ]
         query_dropdown = ttk.OptionMenu(
@@ -77,15 +84,21 @@ class GPT4UI:
             user_query = self.query_entry.get()
         else:
             user_query = selected_query
-
+            
         self.query_entry.delete(0, tk.END)
         self.gpt4.add_message(user_query)
-        
-        folder_name = self.gpt4.extract_filename_from_query(user_query)
-        
-        query_folder = f"{self.gpt4.output_folder}/{folder_name}"
-        
-        os.makedirs(query_folder, exist_ok=True)
+            
+        if self.session['folder_name'] is None:
+            folder_name = self.gpt4.extract_filename_from_query(user_query)
+            
+            query_folder = f"{self.gpt4.output_folder}/{folder_name}"
+            
+            os.makedirs(query_folder, exist_ok=True)
+            
+            self.session['folder_name'] = folder_name
+        else:
+            query_folder = f"{self.gpt4.output_folder}/{self.session['folder_name']}"
+            
 
         output_filename = f"{query_folder}/code.py"
         self.gpt4.generate_and_save_response(output_filename)
@@ -95,9 +108,19 @@ class GPT4UI:
     def update_message_display(self):
         self.message_display.delete(1.0, tk.END)
         for message in self.gpt4.messages:
-            self.message_display.insert(
-                tk.END, f"{message['role'].capitalize()}: {message['content']}\n"
-            )
+            tag = message['role'].capitalize()
+            content = f"{tag}: {message['content']}\n"
+
+            # Assign color based on role
+            if tag == "User":
+                color = "blue"
+            elif tag == "GPT4":
+                color = "green"
+            else:
+                color = "black"
+
+            self.message_display.insert(tk.END, content, (tag,))
+            self.message_display.tag_configure(tag, foreground=color)
         self.message_display.see(tk.END)  # Scroll to the bottom
 
     def run_selected_project(self):
@@ -133,8 +156,7 @@ class GPT4UI:
                 tk.END, f"Output from running the code:\n{output}\n"
             )
 
-
-    
-    def run(self):            
+    def run(self):   
+        self.message_display.config(font=("TkDefaultFont", 10), spacing1=5)         
         self.root.mainloop()
         

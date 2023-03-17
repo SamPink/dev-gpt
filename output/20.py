@@ -24,7 +24,7 @@ def get_satellite_positions(satellite_tle_data):
 
     for sat_name, tle_data in satellite_tle_data.items():
         sat = EarthSatellite(tle_data[0], tle_data[1], sat_name)
-        ecef = sat.at(t).ecef()
+        ecef = sat.at(t).position.km
         sat_positions.append(
             {"satellite": sat_name, "x": ecef[0], "y": ecef[1], "z": ecef[2]}
         )

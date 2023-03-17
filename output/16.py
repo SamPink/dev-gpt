@@ -1,33 +1,59 @@
-from skyfield.api import Topos, load
-import matplotlib.pyplot as plt
+ecef = sat.at(t).position.km
+import requests
+from skyfield.api import Topos, load, EarthSatellite
+from skyfield import almanac
+import plotly.express as px
+import pandas as pd
 
-# Load satellite data from Celestrak
-stations_url = 'http://celestrak.com/NORAD/elements/starlink.txt'
-satellites = load.tle_file(stations_url)
 
-# Load a timescale object to calculate the satellite positions and observer location
-ts = load.timescale()
+def get_starlink_tle_data():
+    response = requests.get("https://www.celestrak.com/NORAD/elements/starlink.txt")
+    tle_lines = response.text.strip().split("\n")
 
-# Set observer location (latitude, longitude) - example coordinates for New York
-observer_location = Topos('40.7128 N', '74.0060 W')
+    satellites = {
+        f"STARLINK-{tle_lines[i].strip()}": [tle_lines[i + 1], tle_lines[i + 2]]
+        for i in range(0, len(tle_lines), 3)
+    }
+    return satellites
 
-# Prepare data for plotting
-figure = plt.figure()
-ax = figure.add_subplot(1, 1, 1)
 
-for satellite in satellites[:20]:  # Track only the first 20 satellites for simplicity
-    difference = satellite - observer_location
-    topocentric = difference.at(ts.now())
-    alt, az, distance = topocentric.altaz()
+def get_satellite_positions(satellite_tle_data):
+    ts = load.timescale()
+    t = ts.now()
 
-    if alt.degrees > 0:  # Satellite in observer's sky
-        eci = satellite.at(ts.now())
-        subpoint_longitude = eci.subpoint().longitude.degrees
-        subpoint_latitude = eci.subpoint().latitude.degrees
-        ax.plot(subpoint_longitude, subpoint_latitude, 'bo', markersize=2)
+    sat_positions = []
 
-# Set map parameters and display
-ax.set_title('Starlink Satellites above the observer')
-ax.set_xlabel('Longitude [degrees]')
-ax.set_ylabel('Latitude [degrees]')
-plt.show()
+    for sat_name, tle_data in satellite_tle_data.items():
+        sat = EarthSatellite(tle_data[0], tle_data[1], sat_name)
+        ecef = sat.at(t).position.km
+        sat_positions.append(
+            {"satellite": sat_name, "x": ecef[0], "y": ecef[1], "z": ecef[2]}
+        )
+
+    return sat_positions
+
+
+def plot_satellite_positions(sat_positions):
+    df = pd.DataFrame(sat_positions)
+
+    fig = px.scatter_3d(
+        df,
+        x="x",
+        y="y",
+        z="z",
+        color="satellite",
+        hover_name="satellite",
+        title="Starlink Satellites in Earth-Centered Earth-Fixed (ECEF) Coordinates",
+    )
+
+    fig.show()
+
+
+def main():
+    starlink_satellites_tle = get_starlink_tle_data()
+    satellite_positions = get_satellite_positions(starlink_satellites_tle)
+    plot_satellite_positions(satellite_positions)
+
+
+if __name__ == "__main__":
+    main()

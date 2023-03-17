@@ -1,1 +1,0 @@
-Write a program that plays Rock-Paper-Scissors against the user.
