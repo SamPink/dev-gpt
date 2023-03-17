@@ -6,6 +6,9 @@ import re
 import os
 import json
 from typing import List, Dict, Union
+import tkinter as tk
+from tkinter import ttk
+from datetime import datetime
 
 
 class GPT4:
@@ -92,15 +95,21 @@ class GPT4:
                 break
 
 
-import tkinter as tk
-from tkinter import ttk
+
 
 
 def submit_query():
-    user_query = query_entry.get()
+    selected_query = query_var.get()
+    if selected_query == "Custom":
+        user_query = query_entry.get()
+    else:
+        user_query = selected_query
+
     query_entry.delete(0, tk.END)
     gpt4.add_message(user_query)
-    output_filename = f"output/{len(gpt4.messages)}.py"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_filename = f"output/{timestamp}_{len(gpt4.messages)}.py"
     gpt4.generate_and_save_response(output_filename)
     gpt4.run_code_and_add_output_to_messages(output_filename)
     update_message_display()
@@ -128,17 +137,27 @@ if __name__ == "__main__":
     mainframe = ttk.Frame(root, padding="5")
     mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-    query_label = ttk.Label(mainframe, text="Enter your query:")
+    query_label = ttk.Label(mainframe, text="Choose a query:")
     query_label.grid(column=0, row=0, sticky=tk.W)
 
+    query_var = tk.StringVar()
+    query_options = [
+        "Custom",
+        "write a python script to get the current eth price in £.",
+        "now update the script to get 7 days of historical data for eth in £",
+        # Add more predefined queries here...
+    ]
+    query_dropdown = ttk.OptionMenu(mainframe, query_var, query_options[0], *query_options)
+    query_dropdown.grid(column=0, row=1, sticky=(tk.W, tk.E))
+
     query_entry = ttk.Entry(mainframe, width=80)
-    query_entry.grid(column=0, row=1, sticky=(tk.W, tk.E))
+    query_entry.grid(column=0, row=2, sticky=(tk.W, tk.E))
 
     submit_button = ttk.Button(mainframe, text="Submit", command=submit_query)
-    submit_button.grid(column=1, row=1, sticky=tk.W)
+    submit_button.grid(column=1, row=2, sticky=tk.W)
 
     message_display = tk.Text(mainframe, wrap=tk.WORD, width=80, height=20)
-    message_display.grid(column=0, row=2, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+    message_display.grid(column=0, row=3, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
 
     update_message_display()
 
