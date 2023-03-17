@@ -26,12 +26,9 @@ class GPT4:
         print("Waiting for GPT response...")
         start_time = time.time()
 
-        resp = openai.ChatCompletion.create(
-            model=self.model,
-            messages=self.messages,
-        )
+        resp = openai.ChatCompletion.create(model=self.model, messages=self.messages,)
 
-        response = resp['choices'][0]['message']['content']
+        response = resp["choices"][0]["message"]["content"]
         self.add_message(response, "assistant")
 
         end_time = time.time()
@@ -41,15 +38,14 @@ class GPT4:
         return response
 
     def extract_code_from_response(self, response: str) -> Dict[str, List[str]]:
-        code_blocks = re.findall(r'```(?:python|bash)?\s*[\s\S]*?```', response)
+        code_blocks = re.findall(r"```(?:python|bash)?\s*[\s\S]*?```", response)
 
-        extracted_code = {
-            "python": [],
-            "bash": []
-        }
+        extracted_code = {"python": [], "bash": []}
 
         for code_block in code_blocks:
-            code_type, code = re.match(r'```(python|bash)?\s*([\s\S]*?)```', code_block).groups()
+            code_type, code = re.match(
+                r"```(python|bash)?\s*([\s\S]*?)```", code_block
+            ).groups()
             code_type = code_type or "python"
             extracted_code[code_type].append(code.strip())
 
@@ -73,18 +69,22 @@ class GPT4:
 
     def run_code_and_add_output_to_messages(self, filename: str):
         while True:
-            result = subprocess.run(['python', filename], capture_output=True, text=True)
+            result = subprocess.run(
+                ["python", filename], capture_output=True, text=True
+            )
             output = result.stdout.strip()
             error = result.stderr.strip()
 
             if error:
-                self.add_message("The following error occurred while running the code:", "system")
+                self.add_message(
+                    "The following error occurred while running the code:", "system"
+                )
                 self.add_message(error, "system")
                 self.add_message("Please help me fix the error in the code.")
 
                 output_filename = f"{self.output_folder}/{len(self.messages)}.py"
                 self.generate_and_save_response(output_filename)
-                self.write_message_to_file(filename, self.messages[-1]['content'])
+                self.write_message_to_file(filename, self.messages[-1]["content"])
             else:
                 if output:
                     self.add_message("I ran the code and this is the output:", "system")
@@ -96,27 +96,36 @@ if __name__ == "__main__":
     gpt4 = GPT4(config.OPENAI_API_KEY)
 
     # Update the initial system message to request code in the specified format
-    gpt4.add_message("Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\n just output the required format, nothing else.", role="system")
+    gpt4.add_message(
+        "Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\n just output the required format, nothing else.",
+        role="system",
+    )
 
-    gpt4.add_message('write a python script to get the current eth price in £.')
+    gpt4.add_message("write a python script to get the current eth price in £.")
 
     output_filename = "output/first.py"
     gpt4.generate_and_save_response(output_filename)
     gpt4.run_code_and_add_output_to_messages(output_filename)
 
-    gpt4.add_message('now update the script to get 30 days of historical data for eth in £')
+    gpt4.add_message(
+        "now update the script to get 30 days of historical data for eth in £"
+    )
 
     output_filename = "output/second.py"
     gpt4.generate_and_save_response(output_filename)
     gpt4.run_code_and_add_output_to_messages(output_filename)
 
-    gpt4.add_message('now update the script to use sqlalchemy to write the data to a local sqllite database, get the data for the top 5 cryptos')
+    gpt4.add_message(
+        "now update the script to use sqlalchemy to write the data to a local sqllite database, get the data for the top 5 cryptos"
+    )
 
     output_filename = "output/third.py"
     gpt4.generate_and_save_response(output_filename)
     gpt4.run_code_and_add_output_to_messages(output_filename)
 
-    gpt4.add_message('now update the script to use the data in the database to create a dashboard using streamlit')
+    gpt4.add_message(
+        "now update the script to use the data in the database to print some cool graphs"
+    )
 
     output_filename = "output/fourth.py"
     gpt4.generate_and_save_response(output_filename)
