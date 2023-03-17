@@ -107,36 +107,77 @@ class GPT4:
                 break
 
 
-def submit_query():
-    selected_query = query_var.get()
-    if selected_query == "Custom":
-        user_query = query_entry.get()
-    else:
-        user_query = selected_query
+class GPT4UI:
+    def __init__(self, gpt4_instance):
+        self.gpt4 = gpt4_instance
+        self.root = tk.Tk()
+        self.root.title("GPT-4 Assistant")
+        self.create_widgets()
 
-    query_entry.delete(0, tk.END)
-    gpt4.add_message(user_query)
-    
-    folder_name = gpt4.extract_filename_from_query(user_query)
-    
-    query_folder = f"{gpt4.output_folder}/{folder_name}"
-    
-    os.makedirs(query_folder, exist_ok=True)
+    def create_widgets(self):
+        mainframe = ttk.Frame(self.root, padding="5")
+        mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-    output_filename = f"{query_folder}/code.py"
-    gpt4.generate_and_save_response(output_filename)
-    gpt4.run_code_and_add_output_to_messages(output_filename)
-    update_message_display()
+        query_label = ttk.Label(mainframe, text="Choose a query:")
+        query_label.grid(column=0, row=0, sticky=tk.W)
 
-
-def update_message_display():
-    message_display.delete(1.0, tk.END)
-    for message in gpt4.messages:
-        message_display.insert(
-            tk.END, f"{message['role'].capitalize()}: {message['content']}\n"
+        self.query_var = tk.StringVar()
+        query_options = [
+            "create a python doodle jump game using pygame",
+            "Custom"
+        ]
+        query_dropdown = ttk.OptionMenu(
+            mainframe, self.query_var, query_options[0], *query_options
         )
-    message_display.see(tk.END)  # Scroll to the bottom
+        query_dropdown.grid(column=0, row=1, sticky=(tk.W, tk.E))
 
+        self.query_entry = ttk.Entry(mainframe, width=80)
+        self.query_entry.grid(column=0, row=2, sticky=(tk.W, tk.E))
+
+        submit_button = ttk.Button(
+            mainframe, text="Submit", command=self.submit_query
+        )
+        submit_button.grid(column=1, row=2, sticky=tk.W)
+
+        self.message_display = tk.Text(
+            mainframe, wrap=tk.WORD, width=80, height=20
+        )
+        self.message_display.grid(column=0, row=3, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        self.update_message_display()
+
+    def submit_query(self):
+        selected_query = self.query_var.get()
+        if selected_query == "Custom":
+            user_query = self.query_entry.get()
+        else:
+            user_query = selected_query
+
+        self.query_entry.delete(0, tk.END)
+        self.gpt4.add_message(user_query)
+        
+        folder_name = self.gpt4.extract_filename_from_query(user_query)
+        
+        query_folder = f"{self.gpt4.output_folder}/{folder_name}"
+        
+        os.makedirs(query_folder, exist_ok=True)
+
+        output_filename = f"{query_folder}/code.py"
+        self.gpt4.generate_and_save_response(output_filename)
+        self.gpt4.run_code_and_add_output_to_messages(output_filename)
+        self.update_message_display()
+
+    def update_message_display(self):
+        self.message_display.delete(1.0, tk.END)
+        for message in self.gpt4.messages:
+            self.message_display.insert(
+                tk.END, f"{message['role'].capitalize()}: {message['content']}\n"
+            )
+        self.message_display.see(tk.END)  # Scroll to the bottom
+
+    def run(self):
+        self.root.mainloop()
+        
 
 if __name__ == "__main__":
     gpt4 = GPT4(config.OPENAI_API_KEY)
@@ -148,101 +189,12 @@ if __name__ == "__main__":
         "file name: ([\\w\\-]+)",
         role="system",
     )
-
-
-    # Create the UI
-    root = tk.Tk()
-    root.title("GPT-4 Assistant")
-
-    mainframe = ttk.Frame(root, padding="5")
-    mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-
-    query_label = ttk.Label(mainframe, text="Choose a query:")
-    query_label.grid(column=0, row=0, sticky=tk.W)
-
-    query_var = tk.StringVar()
-    query_options = [
-        "Custom",
-        "Write a program that plays Rock-Paper-Scissors against the user.",
-        "Create a web scraper that fetches data from a website and saves it to a CSV file.",
-        "Build a GUI application that converts units of measurement (e.g. miles to kilometers).",
-        "Write a program that generates a random password based on user preferences (e.g. length, complexity).",
-        "Implement a chatbot that can answer questions on a specific topic using machine learning.",
-        "Create a program that generates a maze and allows the user to solve it using arrow keys.",
-        "Build a simple game using Pygame library (e.g. Snake, Tetris, Space Invaders).",
-        "Create a program that extracts data from a PDF document and saves it to a text file.",
-        "Build a program that fetches real-time stock market data and displays it in a graph.",
-        "Write a program that generates a word cloud from a text file.",
-        "Create a program that generates a random image and saves it to a file.",
-        "Build a program that detects faces in an image using computer vision.",
-        "Write a program that scrapes data from social media sites (e.g. Twitter, Facebook).",
-    ]
-    query_dropdown = ttk.OptionMenu(mainframe, query_var, query_options[0], *query_options)
-    query_dropdown.grid(column=0, row=1, sticky=(tk.W, tk.E))
-
-    query_entry = ttk.Entry(mainframe, width=80)
-    query_entry.grid(column=0, row=2, sticky=(tk.W, tk.E))
-
-    submit_button = ttk.Button(mainframe, text="Submit", command=submit_query)
-    submit_button.grid(column=1, row=2, sticky=tk.W)
-
-    message_display = tk.Text(mainframe, wrap=tk.WORD, width=80, height=20)
-    message_display.grid(column=0, row=3, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
-
-    update_message_display()
-
-    root.mainloop()
-
-    # Save the messages to a JSON file
-    with open("messages.json", "w") as f:
-        json.dump(gpt4.messages, f)
-
-
-""" 
-if __name__ == "__main__":
-    gpt4 = GPT4(config.OPENAI_API_KEY, model="gpt-3.5-turbo")
-
-    # Update the initial system message to request code in the specified format
+    
     gpt4.add_message(
-        "Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\n just output the required format, nothing else.",
+        "always follow these rules exactly or the code will not work dont output any aditional text",
         role="system",
     )
+    
 
-    gpt4.add_message("write a python script to get the current eth price in £.")
-
-    output_filename = "output/first.py"
-    gpt4.generate_and_save_response(output_filename)
-    gpt4.run_code_and_add_output_to_messages(output_filename)
-
-    gpt4.add_message(
-        "now update the script to get 7 days of historical data for eth in £"
-    )
-
-    output_filename = "output/second.py"
-    gpt4.generate_and_save_response(output_filename)
-    gpt4.run_code_and_add_output_to_messages(output_filename)
-
-    gpt4.add_message(
-        "now update the script to use sqlalchemy to write the data to a local sqllite database, get the data for the top 5 cryptos"
-    )
-
-    output_filename = "output/third.py"
-    gpt4.generate_and_save_response(output_filename)
-    gpt4.run_code_and_add_output_to_messages(output_filename)
-
-    gpt4.add_message(
-        "now update the script to use the data in the database to print some cool graphs"
-    )
-
-    output_filename = "output/fourth.py"
-    gpt4.generate_and_save_response(output_filename)
-    gpt4.run_code_and_add_output_to_messages(output_filename)
-
-    print(gpt4.messages)
-
-    # write the messages to a json file
-    with open("messages.json", "w") as f:
-        json.dump(gpt4.messages, f)
-
- """
-
+    gpt4_ui = GPT4UI(gpt4)
+    gpt4_ui.run()
