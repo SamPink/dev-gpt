@@ -61,3 +61,18 @@ if __name__ == "__main__":
     output_filename = "output/output.py"
     gpt4.generate_and_save_response(output_filename)
     gpt4.run_code_and_add_output_to_messages(output_filename)
+    
+    gpt4.add_message("Update the code so it also gets the historical price of eth in usd for the last 30 days and writes it to a csv file.")
+    
+    output_2_filename = "output/output_2.py"
+    gpt4.generate_and_save_response(output_2_filename)
+    gpt4.run_code_and_add_output_to_messages(output_2_filename)
+    
+    #now update the code so it also gets btc proces, update it to use sqlalchemy and write the data to a database
+    gpt4.add_message("Update the code so it also gets the price of btc in usd and writes it to a database using sqlalchemy.")
+    
+    output_3_filename = "output/output_3.py"
+    gpt4.generate_and_save_response(output_3_filename)
+    gpt4.run_code_and_add_output_to_messages(output_3_filename) 
+    
+    print(gpt4.messages)
