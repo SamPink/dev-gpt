@@ -4980,3 +4980,336 @@ uvicorn main:app --reload
 
 Now you can visit `http://127.0.0.1:8000/tables` to see the list of tables and their columns.
 2023-03-22 11:48:33 [SYSTEM] GPT response received in 36.05 seconds
+2023-03-22 11:57:53 [USER] what is the eth price in £
+2023-03-22 11:57:53 [SYSTEM] Waiting for GPT response...
+2023-03-22 11:57:57 [ASSISTANT] I am an AI language model and cannot provide real-time financial data. To find the latest Ethereum price in GBP, you can visit a financial website or use a cryptocurrency exchange platform such as Coinbase or Binance.
+2023-03-22 11:57:57 [SYSTEM] GPT response received in 3.77 seconds
+2023-03-22 11:59:11 [USER] what is the price on eth in £
+2023-03-22 12:00:58 [USER] what is the price of eth in £
+2023-03-22 12:01:10 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:02:07 [USER] what is the price on eth in £
+2023-03-22 12:02:07 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:02:09 [ASSISTANT] ETH_Price_GBP
+2023-03-22 12:02:09 [SYSTEM] GPT response received in 2.03 seconds
+2023-03-22 12:02:09 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:02:14 [ASSISTANT] I cannot give you real-time prices, but you can check the current price of Ethereum (ETH) in GBP on popular websites like CoinMarketCap, Coinbase or various cryptocurrency exchanges by doing a quick Google search.
+2023-03-22 12:02:14 [SYSTEM] GPT response received in 5.01 seconds
+2023-03-22 12:02:49 [USER] get the price of eth from a public api 
+2023-03-22 12:02:49 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:05:08 [USER] get the price of eth in £
+2023-03-22 12:05:08 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:05:10 [ASSISTANT] ETH_Price_GBP
+2023-03-22 12:05:10 [SYSTEM] GPT response received in 2.04 seconds
+2023-03-22 12:05:10 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:05:18 [ASSISTANT] I am an AI language model, and I cannot provide real-time information. The price of Ethereum (ETH) in British Pounds (GBP) fluctuates constantly, just like any other cryptocurrency. To get the current price, you can check cryptocurrency exchanges, financial news websites, or use a real-time price tracking app.
+2023-03-22 12:05:18 [SYSTEM] GPT response received in 7.81 seconds
+2023-03-22 12:05:48 [USER] write python code to read the current price of eth in £ from a public api 
+2023-03-22 12:05:48 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:06:31 [ASSISTANT] To get the current price of Ethereum (ETH) in British Pounds (GBP), you can use the CoinGecko API, which is a well-known and widely used public API for cryptocurrency data.
+
+First, install the requests library if you haven't already:
+
+```bash
+pip install requests
+```
+
+Then, you can write a Python script to fetch the current price using the following code:
+
+```python
+import requests
+
+def get_eth_price_gbp():
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp"
+    response = requests.get(url)
+    data = response.json()
+    eth_price_gbp = data["ethereum"]["gbp"]
+    return eth_price_gbp
+
+if __name__ == "__main__":
+    eth_price_gbp = get_eth_price_gbp()
+    print("Current ETH price in GBP:", eth_price_gbp)
+```
+
+Save this code as a script, for example `eth_price_gbp.py`, and run it. It will print the current price of ETH in GBP. Please note that using a public API too frequently might lead to rate limiting, so make sure to check the API documentation for usage guidelines.
+2023-03-22 12:06:31 [SYSTEM] GPT response received in 42.57 seconds
+2023-03-22 12:08:36 [USER] get the price of eth in £
+2023-03-22 12:08:36 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:08:38 [ASSISTANT] ETH_Price_GBP
+2023-03-22 12:08:38 [SYSTEM] GPT response received in 1.52 seconds
+2023-03-22 12:08:38 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:08:47 [ASSISTANT] I am an AI language model and do not have real-time financial data. To get the current price of Ethereum (ETH) in GBP (British Pounds), you can check a financial news website or use a cryptocurrency price tracking application. Some popular options include CoinMarketCap, CoinGecko, and Investing.com.
+2023-03-22 12:08:47 [SYSTEM] GPT response received in 9.15 seconds
+2023-03-22 12:09:04 [USER] use a public web api to get the price of eth in £
+2023-03-22 12:09:04 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:09:32 [ASSISTANT] I cannot make requests to external APIs directly, but I can guide you on how to get the data.
+
+
+An easy way to get the price of Ethereum (ETH) in GBP (British Pounds) from a public web API is to use CoinGecko's API. Here is how you can do it using Python and the `requests` library.
+
+First, install the 'requests' library if you don't have it already:
+
+```bash
+pip install requests
+```
+
+Next, create a script with the following code:
+
+```python
+import requests
+
+def get_eth_gbp_price():
+    url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=gbp'
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        json_data = response.json()
+        eth_gbp = json_data['ethereum']['gbp']
+        return eth_gbp
+    else:
+        return None
+
+eth_gbp_price = get_eth_gbp_price()
+if eth_gbp_price is not None:
+    print(f"The current price of 1 ETH in GBP is: £{eth_gbp_price}")
+else:
+    print("Unable to fetch the ETH price in GBP.")
+```
+
+When you run this script, it will fetch the price of Ethereum in GBP from the CoinGecko API and print it on the screen.
+
+Remember that the fetched data is subject to rate limits imposed by the API provider. You may want to verify those limits in CoinGecko's API documentation.
+2023-03-22 12:09:32 [SYSTEM] GPT response received in 28.30 seconds
+2023-03-22 12:09:41 [SYSTEM] I ran the code and this is the output:
+2023-03-22 12:09:41 [SYSTEM] The current price of 1 ETH in GBP is: £1464.44
+2023-03-22 12:09:56 [USER] now get the price for the last 30 days and plot it
+2023-03-22 12:09:56 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:10:34 [ASSISTANT] I cannot execute code or access external APIs directly, but I can help you create a Python script to fetch the last 30 days ETH prices in GBP and plot it using the Pandas and Matplotlib libraries.
+
+First, make sure you have the required libraries installed:
+
+```bash
+pip install requests pandas matplotlib
+```
+
+Next, you can use the following Python script, which fetches historical data using CoinGecko's API and plots the price:
+
+```python
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+
+def get_eth_historical_price(days=30):
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    start_date_str = start_date.strftime('%d-%m-%Y')
+    end_date_str = end_date.strftime('%d-%m-%Y')
+    
+    url = f'https://api.coingecko.com/api/v3/coins/ethereum/market_chart/range?vs_currency=gbp&from={start_date.timestamp()}&to={end_date.timestamp()}'
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        json_data = response.json()
+        return json_data
+    else:
+        return None
+
+def plot_eth_price(data):
+    df = pd.DataFrame(data['prices'], columns=['timestamp', 'price'])
+    df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('date', inplace=True)
+
+    plt.plot(df.index, df['price'])
+    plt.xlabel('Date')
+    plt.ylabel('Price (GBP)')
+    plt.title('Ethereum Price in GBP for the Last 30 Days')
+    plt.xticks(rotation=45)
+    plt.grid()
+    plt.show()
+
+historical_data = get_eth_historical_price(days=30)
+if historical_data is not None:
+    plot_eth_price(historical_data)
+else:
+    print("Unable to fetch historical data.")
+```
+
+This script fetches the historical price data for Ethereum in GBP for the past 30 days and displays a plotted graph using the Pandas and Matplotlib libraries. You can modify the `days` parameter to fetch data for a different duration. Keep in mind that the fetched data is subject to rate limits imposed by the API provider, CoinGecko. You may want to check those limits in their API documentation.
+2023-03-22 12:10:34 [SYSTEM] GPT response received in 37.88 seconds
+2023-03-22 12:11:35 [USER] now predict the price for thenext 30 days 
+2023-03-22 12:11:35 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:12:32 [USER] use a public api to get the floor price for BAYC over the last 30 days 
+2023-03-22 12:12:32 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:12:34 [ASSISTANT] BAYC_FloorPrice_30Days
+2023-03-22 12:12:34 [SYSTEM] GPT response received in 1.97 seconds
+2023-03-22 12:12:34 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:13:10 [ASSISTANT] I cannot make API requests directly, but I can guide you on how to get the floor price for BAYC over the last 30 days using a public API.
+
+You can use the OpenSea API for fetching the historical BAYC floor price data. Please follow these steps:
+
+1. Go to the OpenSea API documentation: https://docs.opensea.io/reference
+
+2. Check the "GET Asset History" endpoint: https://docs.opensea.io/reference/get-asset-history
+
+3. Below is an example of an API request to get the asset history for the Bored Ape Yacht Club collection. Replace "{YOUR_API_KEY}" with your personal API key from OpenSea:
+
+```
+https://api.opensea.io/api/v1/events?asset_contract_address=0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d&event_type=successful&only_opensea=false&offset=0&limit=20&occurred_after=<UNIX_TIMESTAMP_OF_30_DAYS_AGO>&api_key={YOUR_API_KEY}
+```
+
+Make sure to replace `<UNIX_TIMESTAMP_OF_30_DAYS_AGO>` with the Unix timestamp equivalent of 30 days ago.
+
+4. You can parse the JSON response and calculate the floor price with the historical data.
+
+Keep in mind that this API request might not give you exactly 30 days worth of data in a single request. You might have to paginate through the response and make multiple requests to get the entire dataset, then calculate the floor price.
+
+Please note that BAYC is a collection of NFTs, so the floor price will vary for different NFTs in the collection. To get a more accurate floor price for the entire collection, you will need to fetch data for multiple BAYC NFTs and calculate an average floor price across these NFTs.
+2023-03-22 12:13:10 [SYSTEM] GPT response received in 36.52 seconds
+2023-03-22 12:13:12 [SYSTEM] The following error occurred while running the code:
+2023-03-22 12:13:12 [SYSTEM] Traceback (most recent call last):
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3489, in <module>
+    main()
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3482, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2510, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2517, in _exec
+    globals = pydevd_runpy.run_path(file, globals, '__main__')
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 320, in run_path
+    code, fname = _get_code_from_file(run_name, path_name)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 294, in _get_code_from_file
+    code = compile(f.read(), fname, 'exec')
+  File "output/BAYC_FloorPrice_30Day/code_v1.py", line 1
+    https://api.opensea.io/api/v1/events?asset_contract_address=0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d&event_type=successful&only_opensea=false&offset=0&limit=20&occurred_after=<UNIX_TIMESTAMP_OF_30_DAYS_AGO>&api_key={YOUR_API_KEY}
+          ^
+SyntaxError: invalid syntax
+2023-03-22 12:13:12 [USER] Please help me fix the error in the code.
+2023-03-22 12:13:12 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:13:50 [ASSISTANT] I apologize for the confusion. It appears that there was a misunderstanding, as the provided text is an API request URL and not a Python code to fetch the BAYC floor price. Below is a Python code example for fetching the BAYC floor price over the last 30 days using requests library.
+
+```python
+import requests
+from datetime import datetime, timedelta
+
+# Replace with your own OpenSea API key
+API_KEY = 'YOUR_API_KEY'
+
+# Bored Ape Yacht Club contract address
+contract_address = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d'
+
+# Calculate the Unix timestamp of 30 days ago
+timestamp_30_days_ago = int((datetime.now() - timedelta(days=30)).timestamp())
+
+# Prepare the API request URL
+url = f'https://api.opensea.io/api/v1/events?asset_contract_address={contract_address}&event_type=successful&only_opensea=false&offset=0&limit=20&occurred_after={timestamp_30_days_ago}'
+
+# Add your API key to headers
+headers = {'X-API-KEY': API_KEY}
+
+# Send the request
+response = requests.get(url, headers=headers)
+
+# Print the JSON data
+if response.status_code == 200:
+    json_data = response.json()
+    print(json_data)
+else:
+    print(f"Error: {response.status_code}")
+
+# Calculate the floor price using the response data
+# ...
+```
+
+Remember to replace `'YOUR_API_KEY'` with your actual OpenSea API key, and install the `requests` library if you haven't already by running:
+
+```
+pip install requests
+```
+
+This code will fetch the asset history data for the Bored Ape Yacht Club collection over the last 30 days. You can then parse the JSON data and calculate the floor price accordingly.
+2023-03-22 12:13:50 [SYSTEM] GPT response received in 38.04 seconds
+2023-03-22 12:13:52 [SYSTEM] The following error occurred while running the code:
+2023-03-22 12:13:52 [SYSTEM] Traceback (most recent call last):
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3489, in <module>
+    main()
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3482, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2510, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2517, in _exec
+    globals = pydevd_runpy.run_path(file, globals, '__main__')
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 320, in run_path
+    code, fname = _get_code_from_file(run_name, path_name)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 294, in _get_code_from_file
+    code = compile(f.read(), fname, 'exec')
+  File "output/BAYC_FloorPrice_30Day/code_v2.py", line 31
+    pip install requests
+        ^
+SyntaxError: invalid syntax
+2023-03-22 12:13:52 [USER] Please help me fix the error in the code.
+2023-03-22 12:13:52 [SYSTEM] Waiting for GPT response...
+2023-03-22 12:15:02 [ASSISTANT] Apologies for the confusion, the "pip install requests" line is a command to be executed in your terminal or command prompt, not within the Python code. Please remove that line from the code and execute the command in your terminal or command prompt before running the Python code.
+
+Here is the updated Python code without the "pip install requests" line:
+
+```python
+import requests
+from datetime import datetime, timedelta
+
+# Replace with your own OpenSea API key
+API_KEY = 'YOUR_API_KEY'
+
+# Bored Ape Yacht Club contract address
+contract_address = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d'
+
+# Calculate the Unix timestamp of 30 days ago
+timestamp_30_days_ago = int((datetime.now() - timedelta(days=30)).timestamp())
+
+# Prepare the API request URL
+url = f'https://api.opensea.io/api/v1/events?asset_contract_address={contract_address}&event_type=successful&only_opensea=false&offset=0&limit=20&occurred_after={timestamp_30_days_ago}'
+
+# Add your API key to headers
+headers = {'X-API-KEY': API_KEY}
+
+# Send the request
+response = requests.get(url, headers=headers)
+
+# Print the JSON data
+if response.status_code == 200:
+    json_data = response.json()
+    print(json_data)
+else:
+    print(f"Error: {response.status_code}")
+
+# Calculate the floor price using the response data
+# ...
+```
+
+Before running this code, please make sure to install the "requests" library by executing the following command in your terminal or command prompt:
+
+```
+pip install requests
+```
+
+Then, you can run the Python code to fetch the BAYC floor price over the last 30 days.
+2023-03-22 12:15:02 [SYSTEM] GPT response received in 70.37 seconds
+2023-03-22 12:15:03 [SYSTEM] The following error occurred while running the code:
+2023-03-22 12:15:03 [SYSTEM] Traceback (most recent call last):
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3489, in <module>
+    main()
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 3482, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2510, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/pydevd.py", line 2517, in _exec
+    globals = pydevd_runpy.run_path(file, globals, '__main__')
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 320, in run_path
+    code, fname = _get_code_from_file(run_name, path_name)
+  File "/Users/sampink/.vscode/extensions/ms-python.python-2023.4.1/pythonFiles/lib/python/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 294, in _get_code_from_file
+    code = compile(f.read(), fname, 'exec')
+  File "output/BAYC_FloorPrice_30Day/code_v3.py", line 31
+    pip install requests
+        ^
+SyntaxError: invalid syntax
+2023-03-22 12:15:03 [USER] Please help me fix the error in the code.
+2023-03-22 12:15:03 [SYSTEM] Waiting for GPT response...

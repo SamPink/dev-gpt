@@ -144,26 +144,44 @@ class GPT4:
 
 if __name__ == '__main__':
     import config
+
+    # Create a GPT4 instance
     gpt4 = GPT4(config.OPENAI_API_KEY)
-    gpt4.add_message(
-        "act as a senior python developer:\n\n"
-        "```bash\n(required dependencies)\n```\n\n"
-        "```python\n(Python code)\n```\n\n",
-        role="system",
-    )
 
-    gpt4.add_message(
-        "always follow these rules exactly or the code will not work, dont output any additional text and always output the full code",
-        role="system",
-    )
+    # Define the system messages
+    system_messages = [
+        {"text": "act as a senior python developer generate python code in the following format:\n\n"
+                  "```bash\n(required dependencies)\n```\n\n"
+                  "```python\n(Python code)\n```\n\n", "role": "system"},
+        {"text": "always follow these rules exactly or the code will not work, dont output any additional text and always output the full code", "role": "system"}
+    ]
 
-    gpt4.add_message("write a fastapi app that expose all tables in a given database")
+    # Initialize an empty list of messages
+    messages = []
 
-    gpt4.extract_filename_from_query(str(gpt4.session.messages))
-
-    gpt4.generate_and_save_response()
-    gpt4.run_code_and_add_output_to_messages()
+    # Add the system messages first
+    messages.extend(system_messages)
     
-    #save session
-    gpt4.session.save_to_file("session.json")
+    output_saved = False
 
+    # Prompt the user to add more messages until they enter "quit" or "exit"
+    while True:
+        message_text = input("Enter a new message (or type 'quit' to exit): ")
+        if message_text.lower() in ["quit", "exit"]:
+            break
+
+        gpt4.add_message(message_text)
+        
+        if not output_saved:
+            gpt4.extract_filename_from_query(str(gpt4.session.messages))
+            output_saved = True
+        
+
+        # Generate and save response
+        gpt4.generate_and_save_response()
+
+        # Run code and add output to messages
+        gpt4.run_code_and_add_output_to_messages()
+
+    # Save session
+    gpt4.session.save_to_file("session.json")
