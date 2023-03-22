@@ -1,51 +1,50 @@
 import requests
-import folium
-from folium.plugins import MarkerCluster
-import time
+import plotly.express as px
+import pandas as pd
 
-# Replace these with your own OpenSky Network credentials
-USERNAME = "your_username"
-PASSWORD = "your_password"
+# Replace with your Opensky-network API credentials
+username = 'YOUR_USERNAME'
+password = 'YOUR_PASSWORD'
 
-def get_flight_data():
+# Fetch flight data from Opensky-network public API
+def fetch_flight_data():
     url = "https://opensky-network.org/api/states/all"
-    response = requests.get(url, auth=(USERNAME, PASSWORD))
+    response = requests.get(url, auth=(username, password))
 
-    flight_data = response.json()
+    if response.status_code == 200:
+        data = response.json()
+        return data['states']
+    else:
+        print("Error: Unable to fetch flight data")
+        return []
 
-    flight_list = []
-    for flight in flight_data['states']:
-        flight_position = {
-            'icao24': flight[0],
-            'callsign': flight[1].strip(),
-            'lat': flight[6],
-            'lon': flight[5],
-            'altitude': flight[7],
-            'origin_country': flight[2],
-        }
-        flight_list.append(flight_position)
+# Preprocess flight data for plotting using Plotly
+def preprocess_flight_data(flight_data):
+    df = pd.DataFrame(flight_data, columns=['icao24', 'callsign', 'origin_country',
+                                            'time_position', 'last_contact',
+                                            'longitude', 'latitude', 'baro_altitude',
+                                            'on_ground', 'velocity', 'true_track',
+                                            'vertical_rate', 'sensors', 'geo_altitude',
+                                            'squawk', 'spi', 'position_source'])
+    df = df[['callsign', 'latitude', 'longitude', 'baro_altitude', 'velocity', 'origin_country']].dropna()
+    df.columns = ['Call Sign', 'Latitude', 'Longitude', 'Altitude', 'Speed', 'Country']
+    return df
 
-    return flight_list
-
-
-def create_map(flight_list):
-    flight_map = folium.Map(location=[0, 0], zoom_start=2)
-    marker_cluster = MarkerCluster().add_to(flight_map)
-
-    for flight in flight_list:
-        if flight['lat'] and flight['lon'] and flight['callsign']:
-            tooltip = f"{flight['callsign']} ({flight['origin_country']}), Altitude: {flight['altitude']} m"
-            folium.Marker([flight['lat'], flight['lon']], tooltip=tooltip).add_to(marker_cluster)
-
-    return flight_map
-
+# Plot flights on a globe using Plotly
+def plot_flights_on_globe(flight_data):
+    fig = px.scatter_geo(flight_data,
+                         lat='Latitude',
+                         lon='Longitude',
+                         hover_name='Call Sign',
+                         hover_data=['Altitude', 'Speed', 'Country'],
+                         projection='natural earth')
+    fig.show()
 
 def main():
-    while True:
-        flight_list = get_flight_data()
-        flight_map = create_map(flight_list)
-        flight_map.save('flight_tracker.html')
-        time.sleep(300)  # Update every 5 minutes
+    flight_data = fetch_flight_data()
+    if flight_data:
+        flight_data_df = preprocess_flight_data(flight_data)
+        plot_flights_on_globe(flight_data_df)
 
 if __name__ == "__main__":
     main()

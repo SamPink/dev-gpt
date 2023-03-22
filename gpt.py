@@ -9,18 +9,47 @@ from typing import List, Dict
 from datetime import datetime
 
 
+class Session:
+    def __init__(self, project_name: str, output_folder: str = "output"):
+        self.project_name = project_name
+        self.output_folder = output_folder
+        self.path = os.path.join(output_folder, project_name)
+        self.messages = []
+
+    def create_output_folder(self):    
+        self.path = os.path.join(self.output_folder, self.project_name)
+        os.makedirs(self.path, exist_ok=True)
+
+    def save_to_file(self, filename: str = "session.json"):
+        data = {
+            "project_name": self.project_name,
+            "output_folder": self.output_folder,
+            "path": self.path,
+            "messages": self.messages,
+        }
+        filepath = os.path.join(self.path, filename)
+        with open(filepath, "w") as f:
+            json.dump(data, f, indent=4)
+
+    @classmethod
+    def load_from_file(cls, filepath: str):
+        with open(filepath, "r") as f:
+            data = json.load(f)
+
+        session = cls(data["project_name"], data["output_folder"])
+        session.path = data["path"]
+        session.messages = data["messages"]
+        return session
+
+
+
 class GPT4:
     def __init__(self, api_key: str, model: str = "gpt-4"):
         self.api_key = api_key
         self.model = model
-        self.messages = []
+        self.session = Session(project_name=str(uuid.uuid4()))
+        self.version = 1
         openai.api_key = self.api_key
-        self.output_folder = "output"
-        self.folder_name = None
-        output_filename = None
-
-        # Create output folder if it doesn't exist
-        os.makedirs(self.output_folder, exist_ok=True)
 
     def log_message(self, message: str, role: str = "user"):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -30,14 +59,14 @@ class GPT4:
             log_file.write(log_message + "\n")
 
     def add_message(self, message: str, role: str = "user"):
-        self.messages.append({"role": role, "content": message})
+        self.session.messages.append({"role": role, "content": message})
         self.log_message(message, role)
 
     def create_chat_completion(self, messages: List[Dict[str, str]] = None) -> str:
         self.log_message("Waiting for GPT response...", "system")
         start_time = time.time()
 
-        resp = openai.ChatCompletion.create(model=self.model, messages=messages or self.messages)
+        resp = openai.ChatCompletion.create(model=self.model, messages=messages or self.session.messages)
 
         response = resp["choices"][0]["message"]["content"]
         self.add_message(response, "assistant")
@@ -47,7 +76,7 @@ class GPT4:
         self.log_message(f"GPT response received in {elapsed_time:.2f} seconds", "system")
 
         return response
-    
+
     def extract_code_from_response(self, response: str) -> Dict[str, List[str]]:
         code_blocks = re.findall(r"```(?:python|bash)?\s*[\s\S]*?```", response)
 
@@ -63,11 +92,11 @@ class GPT4:
         return extracted_code
 
     def extract_filename_from_query(self, response: str) -> str:
-        name = self.create_chat_completion([{"role": "user", "content": f"genrrate a short file name for this project make sure its a valide windows foldername: {response}"}])[:-1]
-        self.folder_name = name
-        
+        name = self.create_chat_completion([{"role": "user", "content": f"generate a short file name for this project make sure its a valid windows folder name: {response}"}])[:-1]
+        self.session.project_name = name
+        self.session.create_output_folder()
+
         return name
-    
 
     def write_message_to_file(self, filename: str, message: str):
         code = self.extract_code_from_response(message)
@@ -80,18 +109,14 @@ class GPT4:
             os.system(dep)
 
     def generate_and_save_response(self):
-        query_folder = f"{self.output_folder}/{self.folder_name}"
+        self.output_filename = os.path.join(self.session.path, f"code_v{self.version}.py")
 
-        os.makedirs(query_folder, exist_ok=True)
-
-        self.output_filename = f"{query_folder}/code.py"
-        
         response = self.create_chat_completion()
         self.write_message_to_file(self.output_filename, response)
         code = self.extract_code_from_response(response)
         self.install_dependencies(code["bash"])
-        
-        
+
+        self.version += 1
 
     def run_code_and_add_output_to_messages(self):
         while True:
@@ -108,15 +133,15 @@ class GPT4:
                 self.add_message(error, "system")
                 self.add_message("Please help me fix the error in the code.")
 
-
                 self.generate_and_save_response()
-                self.write_message_to_file(self.output_filename, self.messages[-1]["content"])
+                self.write_message_to_file(self.output_filename, self.session.messages[-1]["content"])
             else:
                 if output:
                     self.add_message("I ran the code and this is the output:", "system")
                     self.add_message(output, "system")
                 break
-        
+
+
 if __name__ == '__main__':
     import config
     gpt4 = GPT4(config.OPENAI_API_KEY)
@@ -128,17 +153,17 @@ if __name__ == '__main__':
     )
 
     gpt4.add_message(
-        "always follow these rules exactly or the code will not work, dont output any aditional text and always output the full code",
+        "always follow these rules exactly or the code will not work, dont output any additional text and always output the full code",
         role="system",
     )
 
-    gpt4.add_message("create an application that tracks all flights in real time using a public api and plot them of a globe", role="user")
+    gpt4.add_message("write a fastapi app that expose all tables in a given database")
 
-    gpt4.folder_name = gpt4.extract_filename_from_query(str(gpt4.messages))
-                
-
+    gpt4.extract_filename_from_query(str(gpt4.session.messages))
 
     gpt4.generate_and_save_response()
     gpt4.run_code_and_add_output_to_messages()
-
+    
+    #save session
+    gpt4.session.save_to_file("session.json")
 
