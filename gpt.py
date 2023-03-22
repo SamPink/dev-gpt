@@ -149,7 +149,7 @@ if __name__ == '__main__':
     gpt4 = GPT4(config.OPENAI_API_KEY)
     
     # Update the initial system message to request code in the specified format
-    gpt4.add_message("Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nProvide instructions on how to run the code in the response.", role="system")
+    gpt4.add_message("Act as a senior python dev and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nProvide instructions on how to run the code in the response.", role="system")
 
     output_saved = False
 
