@@ -147,21 +147,10 @@ if __name__ == '__main__':
 
     # Create a GPT4 instance
     gpt4 = GPT4(config.OPENAI_API_KEY)
-
-    # Define the system messages
-    system_messages = [
-        {"text": "act as a senior python developer generate python code in the following format:\n\n"
-                  "```bash\n(required dependencies)\n```\n\n"
-                  "```python\n(Python code)\n```\n\n", "role": "system"},
-        {"text": "always follow these rules exactly or the code will not work, dont output any additional text and always output the full code", "role": "system"}
-    ]
-
-    # Initialize an empty list of messages
-    messages = []
-
-    # Add the system messages first
-    messages.extend(system_messages)
     
+    # Update the initial system message to request code in the specified format
+    gpt4.add_message("Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nProvide instructions on how to run the code in the response.", role="system")
+
     output_saved = False
 
     # Prompt the user to add more messages until they enter "quit" or "exit"
@@ -173,7 +162,7 @@ if __name__ == '__main__':
         gpt4.add_message(message_text)
         
         if not output_saved:
-            gpt4.extract_filename_from_query(str(gpt4.session.messages))
+            gpt4.extract_filename_from_query(str(gpt4.session.messages[-1]))
             output_saved = True
         
 

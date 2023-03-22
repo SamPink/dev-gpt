@@ -1,38 +1,37 @@
 import requests
-import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-def get_eth_historical_price(days=30):
+def get_crypto_prices_for_past_2_years(crypto_id):
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=days)
-    start_date_str = start_date.strftime('%d-%m-%Y')
-    end_date_str = end_date.strftime('%d-%m-%Y')
+    start_date = end_date - timedelta(days=365*2)
+    start_timestamp = int(start_date.timestamp())
+    end_timestamp = int(end_date.timestamp())
     
-    url = f'https://api.coingecko.com/api/v3/coins/ethereum/market_chart/range?vs_currency=gbp&from={start_date.timestamp()}&to={end_date.timestamp()}'
+    url = f"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart/range?vs_currency=gbp&from={start_timestamp}&to={end_timestamp}"
+
     response = requests.get(url)
+    data = response.json()
     
-    if response.status_code == 200:
-        json_data = response.json()
-        return json_data
-    else:
-        return None
+    crypto_prices_gbp = [price_point[1] for price_point in data["prices"]]
+    timestamp_dates = [price_point[0] for price_point in data["prices"]]
+    
+    return timestamp_dates, crypto_prices_gbp
 
-def plot_eth_price(data):
-    df = pd.DataFrame(data['prices'], columns=['timestamp', 'price'])
-    df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
-    df.set_index('date', inplace=True)
-
-    plt.plot(df.index, df['price'])
-    plt.xlabel('Date')
-    plt.ylabel('Price (GBP)')
-    plt.title('Ethereum Price in GBP for the Last 30 Days')
+def plot_crypto_prices(timestamp_dates, eth_prices_gbp, btc_prices_gbp):
+    dates = [datetime.fromtimestamp(ts // 1000) for ts in timestamp_dates]
+    
+    plt.plot(dates, eth_prices_gbp, label="Ethereum (ETH)")
+    plt.plot(dates, btc_prices_gbp, label="Bitcoin (BTC)")
+    plt.xlabel("Date")
+    plt.ylabel("Price in GBP")
+    plt.title("Ethereum (ETH) vs. Bitcoin (BTC) Prices in GBP for the Past 2 Years")
     plt.xticks(rotation=45)
+    plt.legend()
     plt.grid()
+    plt.tight_layout()
     plt.show()
 
-historical_data = get_eth_historical_price(days=30)
-if historical_data is not None:
-    plot_eth_price(historical_data)
-else:
-    print("Unable to fetch historical data.")
+timestamp_dates, eth_prices_gbp = get_crypto_prices_for_past_2_years("ethereum")
+_, btc_prices_gbp = get_crypto_prices_for_past_2_years("bitcoin")
+plot_crypto_prices(timestamp_dates, eth_prices_gbp, btc_prices_gbp)
