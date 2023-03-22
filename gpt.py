@@ -1,12 +1,14 @@
 import json
+import os
+import re
 import subprocess
 import time
 import uuid
-import openai
-import re
-import os
-from typing import List, Dict
 from datetime import datetime
+from typing import Dict, List
+
+import openai
+from openai import error as openai_error
 
 
 class Session:
@@ -66,7 +68,13 @@ class GPT4:
         self.log_message("Waiting for GPT response...", "system")
         start_time = time.time()
 
-        resp = openai.ChatCompletion.create(model=self.model, messages=messages or self.session.messages)
+        while True:
+            try:
+                resp = openai.ChatCompletion.create(model=self.model, messages=messages or self.session.messages, max_tokens=2048)
+                break
+            except openai_error.RateLimitError:
+                self.log_message("The server had an error while processing your request. Retrying in 30 seconds...", "system")
+                time.sleep(30)
 
         response = resp["choices"][0]["message"]["content"]
         self.add_message(response, "assistant")
@@ -115,6 +123,9 @@ class GPT4:
         self.write_message_to_file(self.output_filename, response)
         code = self.extract_code_from_response(response)
         self.install_dependencies(code["bash"])
+        
+        #update the output filename
+        self.output_filename = os.path.join(self.session.path, f"code_v{self.version}.py")
 
         self.version += 1
 
@@ -150,6 +161,8 @@ if __name__ == '__main__':
     
     # Update the initial system message to request code in the specified format
     gpt4.add_message("Act as a senior python dev and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nProvide instructions on how to run the code in the response.", role="system")
+    
+    gpt4.add_message("Do not use any APIs that require a key and do not import any local files. always output the full code.alays keep the code as 1 file that can be run from main", role="system")
 
     output_saved = False
 
