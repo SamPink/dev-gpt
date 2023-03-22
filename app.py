@@ -6,7 +6,7 @@ import config
 if __name__ == "__main__":
     gpt4 = GPT4(config.OPENAI_API_KEY)
     gpt4.add_message(
-        "Please provide a code snippet in the following format:\n\n"
+        "act as a senior python developer:\n\n"
         "```bash\n(required dependencies)\n```\n\n"
         "```python\n(Python code)\n```\n\n",
         role="system",
