@@ -16,6 +16,8 @@ class GPT4:
         self.messages = []
         openai.api_key = self.api_key
         self.output_folder = "output"
+        self.folder_name = None
+        output_filename = None
 
         # Create output folder if it doesn't exist
         os.makedirs(self.output_folder, exist_ok=True)
@@ -26,13 +28,6 @@ class GPT4:
         print(log_message)
         with open("logs.txt", "a") as log_file:
             log_file.write(log_message + "\n")
-            
-    def get_project_list(self):
-        return [
-            project
-            for project in os.listdir(self.output_folder)
-            if os.path.isdir(os.path.join(self.output_folder, project))
-        ]
 
     def add_message(self, message: str, role: str = "user"):
         self.messages.append({"role": role, "content": message})
@@ -68,7 +63,11 @@ class GPT4:
         return extracted_code
 
     def extract_filename_from_query(self, response: str) -> str:
-        return self.create_chat_completion([{"role": "user", "content": f"genrrate file name for this project make sure its a valide windows foldername: {response}"}])[:-1]
+        name = self.create_chat_completion([{"role": "user", "content": f"genrrate a short file name for this project make sure its a valide windows foldername: {response}"}])[:-1]
+        self.folder_name = name
+        
+        return name
+    
 
     def write_message_to_file(self, filename: str, message: str):
         code = self.extract_code_from_response(message)
@@ -80,16 +79,24 @@ class GPT4:
         for dep in dependencies:
             os.system(dep)
 
-    def generate_and_save_response(self, output_filename: str):
+    def generate_and_save_response(self):
+        query_folder = f"{self.output_folder}/{self.folder_name}"
+
+        os.makedirs(query_folder, exist_ok=True)
+
+        self.output_filename = f"{query_folder}/code.py"
+        
         response = self.create_chat_completion()
-        self.write_message_to_file(output_filename, response)
+        self.write_message_to_file(self.output_filename, response)
         code = self.extract_code_from_response(response)
         self.install_dependencies(code["bash"])
+        
+        
 
-    def run_code_and_add_output_to_messages(self, filename: str):
+    def run_code_and_add_output_to_messages(self):
         while True:
             result = subprocess.run(
-                ["python", filename], capture_output=True, text=True
+                ["python", self.output_filename], capture_output=True, text=True
             )
             output = result.stdout.strip()
             error = result.stderr.strip()
@@ -101,14 +108,37 @@ class GPT4:
                 self.add_message(error, "system")
                 self.add_message("Please help me fix the error in the code.")
 
-                output_filename = f"{self.output_folder}/{len(self.messages)}.py"
-                self.generate_and_save_response(output_filename)
-                self.write_message_to_file(filename, self.messages[-1]["content"])
+
+                self.generate_and_save_response()
+                self.write_message_to_file(self.output_filename, self.messages[-1]["content"])
             else:
                 if output:
                     self.add_message("I ran the code and this is the output:", "system")
                     self.add_message(output, "system")
                 break
         
-        
+if __name__ == '__main__':
+    import config
+    gpt4 = GPT4(config.OPENAI_API_KEY)
+    gpt4.add_message(
+        "act as a senior python developer:\n\n"
+        "```bash\n(required dependencies)\n```\n\n"
+        "```python\n(Python code)\n```\n\n",
+        role="system",
+    )
+
+    gpt4.add_message(
+        "always follow these rules exactly or the code will not work, dont output any aditional text and always output the full code",
+        role="system",
+    )
+
+    gpt4.add_message("create an application that tracks all flights in real time using a public api and plot them of a globe", role="user")
+
+    gpt4.folder_name = gpt4.extract_filename_from_query(str(gpt4.messages))
+                
+
+
+    gpt4.generate_and_save_response()
+    gpt4.run_code_and_add_output_to_messages()
+
 
