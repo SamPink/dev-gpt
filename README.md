@@ -1,4 +1,4 @@
-# GPT-4 Python Code Generator CLI
+# dev-gpt
 
 This command-line interface (CLI) app uses OpenAI's GPT-4 to automatically write Python code based on a given prompt. It allows users to interact with GPT-4, request code snippets, save the code to files, and run the generated code. The app also extracts and installs required dependencies and handles potential code execution errors.
 
