@@ -1,0 +1,19 @@
+{
+    "project_name": "crime-map",
+    "output_folder": "output",
+    "path": "output/crime-map",
+    "messages": [
+        {
+            "role": "system",
+            "content": "\nAct as a senior python dev and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nthe code should be in a single file that can be run from main"
+        },
+        {
+            "role": "user",
+            "content": "\n\nmapbox api key \"pk.eyJ1Ijoic3BpbmsiLCJhIjoiY2xlN2hxZW00MDBvZjNwc2NyMmNzZXc0cCJ9.V47jC5udtxn8P13fPNeXOA\"\nCrime heatmap - You can create a crime heatmap using Mapbox and public APIs such as the Crime Data API. This heatmap can display the frequency and intensity of crime incidents in a particular area or city. You can also add features such as filtering by crime type, time period, and demographic information.\n"
+        },
+        {
+            "role": "assistant",
+            "content": "To create a crime heatmap using Mapbox and the provided API key, you can use Python with the `requests` and `folium` libraries. First, let's install the required dependencies:\n\n```bash\npip install requests folium\n```\n\nNext, let's write the Python code:\n\n```python\nimport requests\nimport folium\nfrom folium.plugins import HeatMap\n\n# Replace with your Mapbox API key\nMAPBOX_API_KEY = \"pk.eyJ1Ijoic3BpbmsiLCJhIjoiY2xlN2hxZW00MDBvZjNwc2NyMmNzZXc0cCJ9.V47jC5udtxn8P13fPNeXOA\"\n\n# Replace with your city information and polygon coordinates for your area of interest\nCITY_NAME = \"San Francisco\"\nCOORDINATES = [37.7749, -122.4194]\n\n# Get crime data (use a public API, in this example we use the SFPD API)\ncrime_data_url = \"https://data.sfgov.org/resource/wg3w-h783.json\"\nresponse = requests.get(crime_data_url)\n\n# Check if the request was successful\nif response.status_code == 200:\n    crime_data = response.json()\n\n    # Extract the latitude and longitude from the incident data\n    heatmap_data = [\n        (float(incident[\"latitude\"]), float(incident[\"longitude\"]))\n        for incident in crime_data\n        if \"latitude\" in incident and \"longitude\" in incident\n    ]\n    \n    # Create a Mapbox map\n    map_instance = folium.Map(\n        location=COORDINATES,\n        zoom_start=13,\n        tiles=\"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{{z}}/{{x}}/{{y}}?access_token=\" + MAPBOX_API_KEY,\n        attr=\"Mapbox\",\n    )\n\n    # Add the heatmap layer to the map\n    HeatMap(heatmap_data, radius=12).add_to(map_instance)\n\n    # Save the map to an HTML file\n    map_instance.save(\"crime_heatmap.html\")\n\nelse:\n    print(f\"Error fetching crime data: {response.status_code}\")\n```\n\nThis code will fetch crime incident data for San Francisco and create a heatmap showing the intensity and frequency of crime incidents in the city. The output will be an HTML file named `crime_heatmap.html` that you can open in any web browser to view the heatmap.\n\nYou can modify the `crime_data_url` variable to point to another public API, or add filters to the API request to display data for specific crime types, time periods, or other criteria."
+        }
+    ]
+}
