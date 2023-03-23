@@ -6304,3 +6304,185 @@ locations = [
 
 Replace `your_hmlr_api_key` with the API key you obtained from the UK Land Registry. The code will output an HTML file named `crime_heatmap_house_prices.html`. Open it in any web browser to view the heatmap with house price markers.
 2023-03-23 16:18:44 [SYSTEM] GPT response received in 122.37 seconds
+2023-03-23 16:22:55 [SYSTEM] 
+Act as a senior python dev and provide code in the following format: 
+
+```bash
+(required dependencies)
+```
+
+```python
+(Python code)
+```
+
+the code should be in a single file that can be run from main
+2023-03-23 16:22:55 [USER] "
+create a fastapi web server for the backend of a twitter clone
+
+2023-03-23 16:22:55 [SYSTEM] Waiting for GPT response...
+2023-03-23 16:23:06 [SYSTEM] 
+Act as a senior python dev and provide code in the following format: 
+
+```bash
+(required dependencies)
+```
+
+```python
+(Python code)
+```
+
+the code should be in a single file that can be run from main
+2023-03-23 16:23:06 [USER] "
+create a fastapi web server for the backend of a twitter clone
+
+2023-03-23 16:23:06 [SYSTEM] Waiting for GPT response...
+2023-03-23 16:23:07 [SYSTEM] The server had an error while processing your request. Retrying in 30 seconds...
+2023-03-23 16:23:37 [SYSTEM] The server had an error while processing your request. Retrying in 30 seconds...
+2023-03-23 16:24:53 [ASSISTANT] To create a simple FastAPI web server for a Twitter clone, you can follow the code below. This example uses an in-memory storage to store tweets temporarily, and it does not involve databases or user authentication.
+
+First, install the required dependencies:
+
+```bash
+pip install fastapi
+pip install uvicorn
+```
+
+Next, create a Python file (e.g., `main.py`) and copy the following code inside it:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List, Optional
+
+app = FastAPI()
+
+class Tweet(BaseModel):
+    id: int
+    content: str
+    author: str
+
+tweets = []
+
+@app.post("/tweet")
+async def create_tweet(tweet: Tweet):
+    tweets.append(tweet)
+    return {"status": "Tweet added", "id": tweet.id}
+
+@app.get("/tweets", response_model=List[Tweet])
+async def read_tweets(author: Optional[str] = None):
+    if author:
+        return [tweet for tweet in tweets if tweet.author == author]
+    return tweets
+
+@app.get("/tweet/{tweet_id}", response_model=Tweet)
+async def read_tweet(tweet_id: int):
+    for tweet in tweets:
+        if tweet.id == tweet_id:
+            return tweet
+    return {"status": "Tweet not found", "id": tweet_id}
+
+@app.delete("/tweet/{tweet_id}")
+async def delete_tweet(tweet_id: int):
+    global tweets
+    tweets = [tweet for tweet in tweets if tweet.id != tweet_id]
+    return {"status": "Tweet deleted", "id": tweet_id}
+```
+
+Now, you can run the server using the following command:
+
+```bash
+uvicorn main:app --reload
+```
+
+Now the FastAPI web server is running, and you can test the endpoints using an HTTP client or by visiting the auto-generated docs at `http://127.0.0.1:8000/docs`.
+
+Keep in mind that this is a very basic example, and for a production-ready application, you'd need to add features like database support, user authentication, and more complex error handling.
+2023-03-23 16:24:53 [SYSTEM] GPT response received in 106.74 seconds
+2023-03-23 16:31:07 [SYSTEM] 
+Act as a senior python dev and provide code in the following format: 
+
+```bash
+(required dependencies)
+```
+
+```python
+(Python code)
+```
+
+the code should be in a single file that can be run from main
+
+follow all of these rules exactly or the code will not run
+2023-03-23 16:31:07 [USER] "
+create a fastapi web server for the backend of a twitter clone
+
+2023-03-23 16:31:07 [SYSTEM] Waiting for GPT response...
+2023-03-23 16:31:55 [ASSISTANT] To create a FastAPI web server for the backend of a Twitter clone, you'll need to install some dependencies first. To install the required dependencies, run:
+
+```bash
+pip install fastapi
+pip install uvicorn[standard]
+```
+
+Now create a Python file, for example `twitter_clone.py`, and add the following code:
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Dict
+from uuid import uuid4
+
+app = FastAPI()
+
+class Tweet(BaseModel):
+    author: str
+    content: str
+
+tweets: Dict[str, Tweet] = {}
+
+@app.get("/tweets", response_model=List[Tweet])
+async def get_all_tweets():
+    return list(tweets.values())
+
+@app.get("/tweets/{tweet_id}", response_model=Tweet)
+async def get_tweet(tweet_id: str):
+    if tweet_id not in tweets:
+        raise HTTPException(status_code=404, detail="Tweet not found")
+    return tweets[tweet_id]
+
+@app.post("/tweets", response_model=str)
+async def create_tweet(tweet: Tweet):
+    tweet_id = str(uuid4())
+    tweets[tweet_id] = tweet
+    return tweet_id
+
+@app.put("/tweets/{tweet_id}", response_model=Tweet)
+async def update_tweet(tweet_id: str, updated_tweet: Tweet):
+    if tweet_id not in tweets:
+        raise HTTPException(status_code=404, detail="Tweet not found")
+    tweets[tweet_id] = updated_tweet
+    return updated_tweet
+
+@app.delete("/tweets/{tweet_id}", response_model=str)
+async def delete_tweet(tweet_id: str):
+    if tweet_id not in tweets:
+        raise HTTPException(status_code=404, detail="Tweet not found")
+    del tweets[tweet_id]
+    return f"Deleted tweet with ID {tweet_id}"
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+This code creates a FastAPI application that has endpoints to create, read, update, and delete tweets. The tweets are stored in a dictionary as a simple in-memory datastore.
+
+To run your FastAPI application, open your terminal, navigate to the folder containing the `twitter_clone.py` file, and execute the following command:
+
+```bash
+uvicorn twitter_clone:app --reload
+```
+
+The FastAPI application will start on `0.0.0.0:8000`, and you can use API client tools like Postman or simply a web browser to access the endpoints.
+
+Keep in mind that this is a simple example, and a real-world application would require more features like authentication, pagination, and a persistent database, among others.
+2023-03-23 16:31:55 [SYSTEM] GPT response received in 48.43 seconds

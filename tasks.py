@@ -49,4 +49,6 @@ Act as a senior python dev and provide code in the following format:
 (Python code)
 ```
 
-the code should be in a single file that can be run from main"""
+the code should be in a single file that can be run from main
+
+follow all of these rules exactly or the code will not run"""
