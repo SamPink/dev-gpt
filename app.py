@@ -11,6 +11,16 @@ gpt4.add_message("Do not use any APIs that require a key and do not import any l
 
 output_saved = False
 
+''' gpt4.add_message("this is a python flappy bird game, you press enter to start, then press space to jump. the goal is to get as high score as possible")
+
+#this is the code for the game, import the code from code_v3.py and add it to the message
+with open("code_v3.py", "r") as f:
+    code = f.read()
+    gpt4.add_message(f"the code for the game is is: \n\n```python\n{code}\n```\n\n", role="user")
+
+ '''
+   
+
 # Prompt the user to add more messages until they enter "quit" or "exit"
 while True:
     message_text = input("Enter a new message (or type 'quit' to exit): ")

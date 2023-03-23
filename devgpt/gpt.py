@@ -151,6 +151,9 @@ class GPT4:
                     self.add_message("I ran the code and this is the output:", "system")
                     self.add_message(output, "system")
                 break
+            
+        #save the session to file after running the code
+        self.session.save_to_file()
 
 
 if __name__ == '__main__':
