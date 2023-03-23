@@ -1,1 +1,0 @@
-https://api.opensea.io/api/v1/events?asset_contract_address=0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d&event_type=successful&only_opensea=false&offset=0&limit=20&occurred_after=<UNIX_TIMESTAMP_OF_30_DAYS_AGO>&api_key={YOUR_API_KEY}

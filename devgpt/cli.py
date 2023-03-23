@@ -9,9 +9,8 @@ import os
 from typing import List, Dict
 from datetime import datetime
 
-import config
 
-from gpt import GPT4
+from . import GPT4
 
 # Insert the Session and GPT4 classes here
 
@@ -23,7 +22,7 @@ def main():
     args = parser.parse_args()
 
     # Create a GPT4 instance
-    gpt4 = GPT4(config.OPENAI_API_KEY)
+    gpt4 = GPT4(args.api_key)
 
     # Update the initial system message to request code in the specified format
     gpt4.add_message("Act as a data engineer and provide code in the following format: \n\n```bash\n(required dependencies)\n```\n\n```python\n(Python code)\n```\n\nProvide instructions on how to run the code in the response.", role="system")
