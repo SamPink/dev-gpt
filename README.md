@@ -23,7 +23,7 @@ This command-line interface (CLI) app uses OpenAI's GPT-4 to automatically write
 
 ## Installation
 
-1. Clone this repository: `git clone https://github.com/SamPink/gpt-4-python-code-generator.git`
+1. Clone this repository: `git clone https://github.com/SamPink/dev-gpt.git
 2. Change into the cloned directory: `cd gpt-4-python-code-generator`
 3. Install the required libraries: `pip install -r requirements.txt`
 4. Set up an environment variable for the OpenAI API key: `export OPENAI_API_KEY=your_api_key_here`
