@@ -8,11 +8,8 @@ import re
 import os
 from typing import List, Dict
 from datetime import datetime
-
-
-from . import GPT4
-
-# Insert the Session and GPT4 classes here
+from gpt import GPT4
+from gpt import Session
 
 
 def main():
