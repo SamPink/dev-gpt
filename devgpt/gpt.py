@@ -9,7 +9,8 @@ from typing import Dict, List
 
 import openai
 from openai import error as openai_error
-
+from langchain.utilities import GoogleSearchAPIWrapper
+import devgpt.prompts.tasks as tasks
 
 class Session:
     def __init__(self, project_name: str, output_folder: str = "output"):
@@ -63,8 +64,12 @@ class GPT4:
     def add_message(self, message: str, role: str = "user"):
         self.session.messages.append({"role": role, "content": message})
         self.log_message(message, role)
+        
+    def search_google(self, query: str):
+        search = GoogleSearchAPIWrapper()
+        return search.run(query)
 
-    def create_chat_completion(self, messages: List[Dict[str, str]] = None) -> str:
+    def create_chat_completion(self, messages: List[Dict[str, str]] = None):
         self.log_message("Waiting for GPT response...", "system")
         start_time = time.time()
 
@@ -99,8 +104,8 @@ class GPT4:
 
         return extracted_code
 
-    def extract_filename_from_query(self, response: str) -> str:
-        name = self.create_chat_completion([{"role": "user", "content": f"generate a short file name for this project make sure its a valid windows folder name: {response}"}])[:-1]
+    def extract_filename_from_query(self, response: str):
+        name = self.create_chat_completion([{"role": "user", "content": f"generate a short file name for this project with no spaces: {response}"}])[:-1]
         self.session.project_name = name
         self.session.create_output_folder()
 
@@ -129,6 +134,9 @@ class GPT4:
 
         self.version += 1
 
+    def run(self):
+        return self.run_code_and_add_output_to_messages()
+    
     def run_code_and_add_output_to_messages(self):
         while True:
             result = subprocess.run(
@@ -137,12 +145,12 @@ class GPT4:
             output = result.stdout.strip()
             error = result.stderr.strip()
 
-            if error:
-                self.add_message(
-                    "The following error occurred while running the code:", "system"
-                )
-                self.add_message(error, "system")
-                self.add_message("Please help me fix the error in the code.")
+            if error:                
+                #google the error message 
+                self.add_message(f"Here are some results from google to help with the error: \n\n{self.search_google(error)}", "system")
+                
+                #ask gpt to try and fix the error
+                self.add_message(f"Please help me fix the error in the code: \n\n{error}", "user")
 
                 self.generate_and_save_response()
                 self.write_message_to_file(self.output_filename, self.session.messages[-1]["content"])
@@ -155,6 +163,25 @@ class GPT4:
         #save the session to file after running the code
         self.session.save_to_file()
 
+    def start_project(self, project_instructions):
+        self.add_message(tasks.system_message, role="system")
+        
+        self.add_message(project_instructions, role="user")
+        
+        #generate the first response
+        self.extract_filename_from_query(str(self.session.messages[-1]))
+        self.session.create_output_folder()
+        
+        #do some research on the project instructions
+        results = f"Here are some results from google to help with the project: \n\n{self.search_google(project_instructions)}"
+        self.add_message(results, role="user")
+
+        # Generate and save response
+        self.generate_and_save_response()
+        
+        # Run code and add output to messages
+        self.run_code_and_add_output_to_messages()
+        
 
 if __name__ == '__main__':
     import devgpt.prompts.config as config
