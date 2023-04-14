@@ -1,4 +1,4 @@
-import config
+import devgpt.prompts.config as config
 from devgpt import GPT4
 
 # Create a GPT4 instance

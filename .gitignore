@@ -5,3 +5,5 @@ data/***
 __pycache__/***
 myenv/***
 logs.txt
+devgpt/__pycache__/***
+devgpt/prompts/config.py

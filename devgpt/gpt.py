@@ -157,7 +157,7 @@ class GPT4:
 
 
 if __name__ == '__main__':
-    import config
+    import devgpt.prompts.config as config
 
     # Create a GPT4 instance
     gpt4 = GPT4(config.OPENAI_API_KEY)

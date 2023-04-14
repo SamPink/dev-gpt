@@ -2,7 +2,7 @@ import subprocess
 import time
 import uuid
 import openai
-import config
+import devgpt.prompts.config as config
 import re
 import os
 import json
