@@ -49,6 +49,8 @@ Act as a senior python dev and provide code in the following format:
 (Python code)
 ```
 
-the code should be in a single file that can be run from main
-
-follow all of these rules exactly or the code will not run"""
+the code should be in a single file that can be run from main.
+never try to import any local files, or external apis that require a key.
+the code should run without any aditional configuration.
+follow all of these rules exactly or the code will not run.
+"""

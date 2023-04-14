@@ -43,6 +43,8 @@ class Session:
         session.path = data["path"]
         session.messages = data["messages"]
         return session
+    
+    
 
 
 
@@ -66,8 +68,10 @@ class GPT4:
         self.log_message(message, role)
         
     def search_google(self, query: str):
+        search_query = self.create_chat_completion([{"role": "user", "content": f"summarise this project in 3 words {query}"}])
+       
         search = GoogleSearchAPIWrapper()
-        return search.run(query)
+        return search.run(search_query)
 
     def create_chat_completion(self, messages: List[Dict[str, str]] = None):
         self.log_message("Waiting for GPT response...", "system")
@@ -181,7 +185,17 @@ class GPT4:
         
         # Run code and add output to messages
         self.run_code_and_add_output_to_messages()
+      
+    def update_project(self, project_instructions):
+        self.add_message(project_instructions)
         
+        self.add_message("remember the system message! keep the code as 1 file that can be run from main and output the full file", role="system")
+
+        # Generate and save response
+        self.generate_and_save_response()
+
+        # Run code and add output to messages
+        self.run_code_and_add_output_to_messages()
 
 if __name__ == '__main__':
     import devgpt.prompts.config as config
