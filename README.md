@@ -1,7 +1,7 @@
 # dev-gpt
 
-## How to use
-Currently the best way to use dev-gpt is through the Jupyter notebook called dev-gpt
+## About
+*Currently the best way to use dev-gpt is through the Jupyter notebook called dev-gpt*
 
 This command-line interface (CLI) app uses OpenAI's GPT-4 to automatically write Python code based on a given prompt. It allows users to interact with GPT-4, request code snippets, save the code to files, and run the generated code. The app also extracts and installs required dependencies and handles potential code execution errors.
 
@@ -30,46 +30,44 @@ This command-line interface (CLI) app uses OpenAI's GPT-4 to automatically write
 
 ## Usage
 
-1. Run the CLI app: `python cli.py --api_key your_api_key`
-2. Enter a message to provide a prompt for GPT-4. For example:
+To use the `dev-gpt` CLI application, follow the steps outlined below:
 
-```
-Enter a new message (or type 'quit' to exit): Write a Python function to find the factorial of a given number.
-```
+1. Begin by launching the CLI app using the command `python cli.py --api_key your_api_key`.
 
-3. GPT-4 generates a response with the code snippet and provides instructions on how to run the code. The response will be in the following format:
+2. You will be asked to enter a message. This message serves as a prompt for GPT-4. An example input could be: 
 
-```
-```bash
-(required dependencies)
-```
+    ```
+    Enter a new message (or type 'quit' to exit): Write a Python function to find the factorial of a given number.
+    ```
 
-```python
-(Python code)
-```
+3. GPT-4 will respond by generating a code snippet. Additionally, it will provide instructions on how to execute the generated code. This information will be presented in the following format:
 
-Provide instructions on how to run the code in the response.
-```
+    ```
+    (required dependencies)
+    (Python code)
+    ```
 
-4. The app saves generated code to a file and runs the code. Any output is displayed in the CLI.
+    Guidance on how to execute the code will follow.
 
-5. If there are any errors in the code, the app asks for help to fix the errors and generates a new response.
+4. The application will save the generated code to a file and run it. Any output from the execution will be displayed in the CLI.
 
-6. To exit the CLI, type `quit` or `exit`.
+5. In the event of any errors in the code, the app will provide assistance in rectifying them and generate a fresh response.
 
-7. The session information is saved in a JSON file named `session.json`.
+6. To end the CLI session, simply type `quit` or `exit`.
+
+7. All session data will be saved in a JSON file named `session.json`.
 
 ## Example
 
+This is a sample interaction with the CLI application:
+
 ```
 $ python cli.py --api_key your_api_key
-Enter a new message (or type 'quit' to exit): Write a Python function to find the factorial of a given number.
-
-GPT-4 Response:
-```bash
+Enter a new message (or type 'quit' to exit): "Write a Python function to find the factorial of a given number."
 ```
-
 ```python
+#GPT-4 Response:
+
 def factorial(n: int) -> int:
     if n == 0:
         return 1
@@ -77,10 +75,15 @@ def factorial(n: int) -> int:
         return n * factorial(n-1)
 ```
 
-To run the code, call the `factorial` function with an integer argument, like `factorial(5)`.
+Then to run the code, you could call the `factorial` function with an integer argument, like `factorial(5)`.
 
+```
 $ python cli.py --api_key your_api_key
-Enter a new message (or type 'quit' to exit): Run the factorial function with the input 5.
+Enter a new message (or type 'quit' to exit): "Run the factorial function with the input 5."
+```
+```bash
+#GPT-4 Response:
+
 I ran the code and this is the output:
 Factorial of 5 is: 120
 ```
