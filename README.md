@@ -75,7 +75,7 @@ def factorial(n: int) -> int:
         return n * factorial(n-1)
 ```
 
-Then to run the code, you could call the `factorial` function with an integer argument, like `factorial(5)`.
+Then you could call the `factorial` function with an integer argument, like `factorial(5)`.
 
 ```
 $ python cli.py --api_key your_api_key
