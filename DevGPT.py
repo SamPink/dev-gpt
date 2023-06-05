@@ -5,6 +5,7 @@ from typing import Dict, List
 from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 
 class PythonDevAssistant:
@@ -26,7 +27,7 @@ class PythonDevAssistant:
         the code should run without any aditional configuration.
         follow all of these rules exactly or the code will not run.
         """
-        self.chat = ChatOpenAI(temperature=0)  # , model="gpt-4")
+        self.chat = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0, model='gpt-4')
         self.messages = [
             SystemMessage(content=self.system_message),
         ]
