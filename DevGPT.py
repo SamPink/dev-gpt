@@ -75,8 +75,7 @@ class PythonDevAssistant:
                 result = subprocess.run(
                     ["python", "temp.py"], capture_output=True, text=True, check=True
                 )
-                generated_code = code["python"][0]
-                exec(generated_code)  # Run the generated code
+                return result.stdout
 
             except subprocess.CalledProcessError as e:
                 error_message = f"I got this error when running the code can you help me fix it. remember to always output the full code and listen to the system message: {e.stderr}"
@@ -89,4 +88,4 @@ class PythonDevAssistant:
 
 if __name__ == "__main__":
     assistant = PythonDevAssistant()
-    assistant.generate_code("plot some cool data")
+    print(assistant.generate_code("create a siple pygame"))
