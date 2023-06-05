@@ -2,6 +2,16 @@
 /.ipynb_checkpoints
 /config.py
 data/***
-__pycache__/***
 myenv/***
 logs.txt
+devgpt/prompts/config.py
+***/***/__pycache__/***
+.env
+.gitignore
+dev-gpt-test.ipynb
+venv/***
+output/***
+temp.py
+logs.txt
+cv.md
+Notebooks/***

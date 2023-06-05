@@ -1,86 +1,40 @@
-# dev-gpt
+PythonDevAssistant
 
-## How to use
-Currently the best way to use dev-gpt is through the Jupyter notebook called dev-gpt
+PythonDevAssistant is your on-demand Python developer that empowers you to create Python applications instantly. Our vision is to make software development seamless and accessible to all. With PythonDevAssistant, everyone can become a developer without needing to master complex programming languages. This script contains a minimal working example of our solution.
 
-This command-line interface (CLI) app uses OpenAI's GPT-4 to automatically write Python code based on a given prompt. It allows users to interact with GPT-4, request code snippets, save the code to files, and run the generated code. The app also extracts and installs required dependencies and handles potential code execution errors.
+Introduction
 
-## Features
+PythonDevAssistant is more than a tool—it's a creative partner. From creating games to setting up complex data analysis tools, PythonDevAssistant has you covered. Whether you're a startup looking to quickly validate your ideas, a researcher in need of custom tools, or a business seeking to automate your workflows, PythonDevAssistant is your solution.
 
-- Interact with GPT-4 through a command-line interface
-- Automatically generate Python code based on user input
-- Extract and install required dependencies
-- Save generated code to a file
-- Run generated code and display the output
-- Error handling for code execution
-- Save the session information in JSON format
+How it Works
 
-## Requirements
+The PythonDevAssistant class is the core of this minimal working example. When instantiated, it sets up a chat interface with an OpenAI model, primed to act as a senior Python developer. It accepts prompts in natural language and generates Python code in response. The generated code is designed to be self-contained and easily executable, with no dependencies on local files or external APIs requiring a key.
 
-- Python 3.6+
-- `openai` library (install via `pip install openai`)
-- An OpenAI API key (obtain from [OpenAI](https://beta.openai.com/signup/))
+Using PythonDevAssistant
 
-## Installation
-
-1. Clone this repository: `git clone https://github.com/SamPink/dev-gpt.git
-2. Change into the cloned directory: `cd gpt-4-python-code-generator`
-3. Install the required libraries: `pip install -r requirements.txt`
-4. Set up an environment variable for the OpenAI API key: `export OPENAI_API_KEY=your_api_key_here`
-
-## Usage
-
-1. Run the CLI app: `python cli.py --api_key your_api_key`
-2. Enter a message to provide a prompt for GPT-4. For example:
-
-```
-Enter a new message (or type 'quit' to exit): Write a Python function to find the factorial of a given number.
-```
-
-3. GPT-4 generates a response with the code snippet and provides instructions on how to run the code. The response will be in the following format:
-
-```
-```bash
-(required dependencies)
-```
+You can run the PythonDevAssistant as a standalone Python program. Simply create an instance of the class and call the generate_code method with a prompt of your choice. For example:
 
 ```python
-(Python code)
+assistant = PythonDevAssistant()
+assistant.generate_code("plot some cool data")
 ```
 
-Provide instructions on how to run the code in the response.
-```
+The generate_code method attempts to generate a valid Python code snippet in response to the prompt. If the code fails to execute, the method will automatically ask the model for a fix and attempt to execute the fixed code. This process repeats until the code runs successfully or the maximum number of attempts is reached.
 
-4. The app saves generated code to a file and runs the code. Any output is displayed in the CLI.
+Requirements
 
-5. If there are any errors in the code, the app asks for help to fix the errors and generates a new response.
+To run PythonDevAssistant, you will need Python 3.6 or later and the dotenv package installed. The dotenv package is used to load environment variables from a .env file in your project root, which should contain your OpenAI API key.
 
-6. To exit the CLI, type `quit` or `exit`.
+Goals and Future Work
 
-7. The session information is saved in a JSON file named `session.json`.
+This minimal working example represents the first step in our journey to revolutionize software development and democratize programming. As we continue to develop PythonDevAssistant, we plan to expand its capabilities and make it even easier to use. We envision a future where anyone, regardless of their coding experience, can rapidly prototype applications, set up data pipelines, create interactive visualizations, and automate routine tasks.
 
-## Example
+Feedback and Contributions
 
-```
-$ python cli.py --api_key your_api_key
-Enter a new message (or type 'quit' to exit): Write a Python function to find the factorial of a given number.
+We welcome feedback and contributions from the community. Please feel free to open an issue or submit a pull request. Together, we can build the future of code generation.
 
-GPT-4 Response:
-```bash
-```
+Disclaimer
 
-```python
-def factorial(n: int) -> int:
-    if n == 0:
-        return 1
-    else:
-        return n * factorial(n-1)
-```
+This is a minimal working example (MWE) and should be used with that in mind. It may have bugs and limitations, and we are constantly working to improve it. Please use this responsibly and provide us with feedback so we can make it better.
 
-To run the code, call the `factorial` function with an integer argument, like `factorial(5)`.
-
-$ python cli.py --api_key your_api_key
-Enter a new message (or type 'quit' to exit): Run the factorial function with the input 5.
-I ran the code and this is the output:
-Factorial of 5 is: 120
-```
+Note: This script and its content are intended for educational and research purposes only. The use of the code and/or information present in this script is the sole responsibility of the user. The maintainers of this script are not responsible for any damage, loss, or violation of any kind caused by the use or misuse of the code or information from this script.
