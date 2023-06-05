@@ -1,8 +1,7 @@
 import os
 import re
-import traceback
 import subprocess
-
+from typing import Dict, List
 from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
@@ -27,27 +26,34 @@ class PythonDevAssistant:
         the code should run without any aditional configuration.
         follow all of these rules exactly or the code will not run.
         """
-        self.chat = ChatOpenAI(temperature=0)
+        self.chat = ChatOpenAI(temperature=0)  # , model="gpt-4")
         self.messages = [
             SystemMessage(content=self.system_message),
         ]
 
-    def extract_code_from_response(self, response: str):
+    def extract_code_from_response(self, response: str) -> Dict[str, List[str]]:
         code_blocks = re.findall(r"```(?:python|bash)?\s*[\s\S]*?```", response)
-        return next(
-            (
-                re.match(r"```(python|bash)?\s*([\s\S]*?)```", code_block).groups()[1]
-                for code_block in code_blocks
-                if "python" in code_block
-            ),
-            "",
-        )
+
+        extracted_code = {"python": [], "bash": []}
+
+        for code_block in code_blocks:
+            code_type, code = re.match(
+                r"```(python|bash)?\s*([\s\S]*?)```", code_block
+            ).groups()
+            code_type = code_type or "python"
+            extracted_code[code_type].append(code.strip())
+
+        return extracted_code
 
     def add_message_to_chat(self, message, role="human"):
         if role == "human":
             self.messages.append(HumanMessage(content=message))
         elif role == "system":
             self.messages.append(SystemMessage(content=message))
+
+    def install_dependencies(self, dependencies: List[str]):
+        for dep in dependencies:
+            os.system(dep)
 
     def generate_code(self, prompt: str, max_attempts=5):
         attempt = 0
@@ -58,30 +64,28 @@ class PythonDevAssistant:
 
             resp = self.chat(self.messages)
             code = self.extract_code_from_response(resp.content)
+            self.install_dependencies(code["bash"])
 
             # Write the code to a temporary Python file
             with open("temp.py", "w") as f:
-                f.write(code)
+                f.write(code["python"][0])
 
             try:
                 # Execute the Python file and capture the output
                 result = subprocess.run(
                     ["python", "temp.py"], capture_output=True, text=True, check=True
                 )
-                print(result.stdout)  # Print the output of the executed code
+                print(result.stdout)  # Return the output of the executed code
 
-                self.add_message_to_chat(
-                    f"the result of running the code is: {result.stdout}"
-                )
-                break  # If the code executes successfully, break the loop
             except subprocess.CalledProcessError as e:
                 error_message = f"I got this error when running the code can you help me fix it. remember to always output the full code and listen to the system message: {e.stderr}"
-
                 self.add_message_to_chat(error_message)
                 if attempt == max_attempts:
-                    print("Max attempts reached. Unable to generate valid code.")
+                    raise ValueError(
+                        "Max attempts reached. Unable to generate valid code."
+                    )
 
 
 if __name__ == "__main__":
     assistant = PythonDevAssistant()
-    assistant.generate_code("get the last house sold in england and print the price")
+    assistant.generate_code("plot the price of eth")
