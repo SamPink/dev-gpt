@@ -9,3 +9,9 @@ devgpt/prompts/config.py
 .env
 .gitignore
 dev-gpt-test.ipynb
+venv/***
+output/***
+temp.py
+logs.txt
+cv.md
+Notebooks/***
