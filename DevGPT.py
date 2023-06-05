@@ -12,19 +12,27 @@ class PythonDevAssistant:
     def __init__(self):
         load_dotenv()
         self.system_message = """
-        Act as a senior python dev and provide code in the following format: 
+        Act as a senior python dev and provide code 
+        try write as few lines of code as possible while writing pythonic code 
+        output the following format: 
 
         ```bash
         (required dependencies)
         ```
 
         ```python
-        (Python code)
+        imports 
+
+        def main():
+            code
+
+        if __name__ == "__main__":
+            main()a
         ```
 
         the code should be in a single file that can be run from main.
-        never try to import any local files, or external apis that require a key.
-        the code should run without any aditional configuration.
+        NEVER try to import any local files, 
+        NEVER tyy to use ant external apis that require a key. only use publickly available data.
         follow all of these rules exactly or the code will not run.
         """
         self.chat = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0, model='gpt-4')
@@ -89,4 +97,7 @@ class PythonDevAssistant:
 
 if __name__ == "__main__":
     assistant = PythonDevAssistant()
-    print(assistant.generate_code("create a siple pygame"))
+    task = """
+    create a dash app with some graphs on
+    """
+    print(assistant.generate_code(task))
