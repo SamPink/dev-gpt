@@ -1,103 +1,76 @@
-import os
 import re
 import subprocess
-from typing import Dict, List
-from dotenv import load_dotenv
+from venv import create
 from langchain.chat_models import ChatOpenAI
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-
 
 class PythonDevAssistant:
     def __init__(self):
-        load_dotenv()
-        self.system_message = """
-        Act as a senior python dev and provide code 
-        try write as few lines of code as possible while writing pythonic code 
-        output the following format: 
-
-        ```bash
-        (required dependencies)
-        ```
-
-        ```python
-        imports 
-
-        def main():
-            code
-
-        if __name__ == "__main__":
-            main()a
-        ```
-
-        the code should be in a single file that can be run from main.
-        NEVER try to import any local files, 
-        NEVER tyy to use ant external apis that require a key. only use publickly available data.
-        follow all of these rules exactly or the code will not run.
-        """
+        self.venv_dir = "./temp"
+        self.create_venv()
         self.chat = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0, model='gpt-4')
-        self.messages = [
-            SystemMessage(content=self.system_message),
-        ]
+        self.messages = [SystemMessage(content=self.get_system_message())]
 
-    def extract_code_from_response(self, response: str) -> Dict[str, List[str]]:
-        code_blocks = re.findall(r"```(?:python|bash)?\s*[\s\S]*?```", response)
+    def get_system_message(self):
+        return """
+            Act as a senior python dev and provide code 
+            try write as few lines of code as possible while writing pythonic code 
+            output the following format: 
+            ```bash
+            (required dependencies)
+            ```
+            ```python
+            imports 
+            def main():
+                code
+            if __name__ == "__main__":
+                main()
+            ```
+            the code should be in a single file that can be run from main.
+            NEVER try to import any local files, 
+            NEVER try to use any external APIs that require a key. Only use publicly available data.
+            Follow all of these rules exactly or the code will not run.
+        """
 
-        extracted_code = {"python": [], "bash": []}
+    def create_venv(self):
+        create(self.venv_dir, with_pip=True)
 
-        for code_block in code_blocks:
-            code_type, code = re.match(
-                r"```(python|bash)?\s*([\s\S]*?)```", code_block
-            ).groups()
-            code_type = code_type or "python"
-            extracted_code[code_type].append(code.strip())
+    def extract_code(self, response: str):
+        return {t: re.findall(fr"```{t}\s*([\s\S]*?)```", response) for t in ["python", "bash"]}
 
-        return extracted_code
+    def add_msg(self, message, role="human"):
+        self.messages.append(HumanMessage(content=message) if role == "human" else SystemMessage(content=message))
 
-    def add_message_to_chat(self, message, role="human"):
-        if role == "human":
-            self.messages.append(HumanMessage(content=message))
-        elif role == "system":
-            self.messages.append(SystemMessage(content=message))
-
-    def install_dependencies(self, dependencies: List[str]):
+    def install_deps(self, dependencies):
         for dep in dependencies:
-            os.system(dep)
+            subprocess.check_call([f"{self.venv_dir}/bin/python", "-m"] + dep.split())
 
-    def generate_code(self, prompt: str, max_attempts=5):
-        attempt = 0
-        self.add_message_to_chat(prompt)
+    def run_script(self, script_path):
+        return subprocess.run([f"{self.venv_dir}/bin/python", script_path], capture_output=True, text=True, check=True)
 
-        while attempt < max_attempts:
-            attempt += 1
+    def generate_code(self, prompt: str, attempts=5):
+        self.add_msg(prompt)
+        for _ in range(attempts):
+            code = self.extract_code(self.chat(self.messages).content)
+            self.install_deps(code["bash"])
 
-            resp = self.chat(self.messages)
-            code = self.extract_code_from_response(resp.content)
-            self.install_dependencies(code["bash"])
-
-            # Write the code to a temporary Python file
             with open("temp.py", "w") as f:
                 f.write(code["python"][0])
 
             try:
-                # Execute the Python file and capture the output
-                result = subprocess.run(
-                    ["python", "temp.py"], capture_output=True, text=True, check=True
-                )
-                return result.stdout
+                return self.run_script("temp.py").stdout
+            except subprocess.CalledProcessError:
+                self.add_msg(f"I got an error when running the code. Can you help me fix it?")
 
-            except subprocess.CalledProcessError as e:
-                error_message = f"I got this error when running the code can you help me fix it. remember to always output the full code and listen to the system message: {e.stderr}"
-                self.add_message_to_chat(error_message)
-                if attempt == max_attempts:
-                    raise ValueError(
-                        "Max attempts reached. Unable to generate valid code."
-                    )
+        raise ValueError("Max attempts reached. Unable to generate valid code.")
+
 
 
 if __name__ == "__main__":
     assistant = PythonDevAssistant()
-    task = """
-    create a dash app with some graphs on
-    """
-    print(assistant.generate_code(task))
+    print(assistant.generate_code("""
+        get the price of eth for the last 2 years, 
+        then use that to predict the price for the next week. show the predicted price on the same graph
+        show all your findings
+    """))
