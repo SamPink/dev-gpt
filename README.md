@@ -2,7 +2,8 @@
 
 PythonDevAssistant is your on-demand Python developer that empowers you to create Python applications instantly. Our vision is to make software development seamless and accessible to all. With PythonDevAssistant, everyone can become a developer without needing to master complex programming languages. This script contains a minimal working example of our solution.
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://drive.google.com/uc?export=download&id=19IK_FLa-OhNZ6XpXY8JP5iqJL-Cv_wx5)
+
+https://github.com/SamPink/dev-gpt/assets/42603236/9840122b-5e1a-4108-b610-8aac75288efb
 
 
 ## Introduction
