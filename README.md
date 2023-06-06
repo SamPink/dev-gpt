@@ -6,6 +6,9 @@ PythonDevAssistant is your on-demand Python developer that empowers you to creat
 https://github.com/SamPink/dev-gpt/assets/42603236/9840122b-5e1a-4108-b610-8aac75288efb
 
 
+![Simple weather app](https://github.com/SamPink/dev-gpt/assets/42603236/2f192127-bcb4-43f4-8770-ee95c69e2b61)
+
+
 ## Introduction
 
 PythonDevAssistant is more than a tool—it's a creative partner. From creating games to setting up complex data analysis tools, PythonDevAssistant has you covered. Whether you're a startup looking to quickly validate your ideas, a researcher in need of custom tools, or a business seeking to automate your workflows, PythonDevAssistant is your solution.
